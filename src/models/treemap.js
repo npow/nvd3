@@ -7,8 +7,15 @@ nv.models.treemap = function() {
       width = 960,
       height = 500 - margin.top - margin.bottom,
       formatNumber = d3.format(",d"),
-      getChildren = function (d) { return d.children; },
-      getLabel = function(d) { return d.name; };
+      getChildren = function(d) { return d.children; },
+      getLabel = function(d) { return d.name; },
+      getValue = function(d) { return d.value; };
+
+  // TODO: Figure out if there is a better way to do this
+  function getValueInternal(d) {
+      if (d.__value !== undefined) return d.__value;
+      return getValue(d);
+  }
 
   function label(d) {
       return d.parent
@@ -32,8 +39,9 @@ nv.models.treemap = function() {
 
         var treemap = d3.layout.treemap()
             .children(function(d, depth) { return depth ? null : d._children; })
-            .sort(function(a, b) { return a.value - b.value; })
+            .sort(function(a, b) { return getValueInternal(a) - getValueInternal(b); })
             .ratio(height / width * 0.5 * (1 + Math.sqrt(5)))
+            .value(getValueInternal)
             .round(false);
 
         var svg = container
@@ -76,8 +84,8 @@ nv.models.treemap = function() {
         // the children being overwritten when when layout is computed.
         function accumulate(d) {
             return (d._children = getChildren(d))
-                ? d.value = getChildren(d).reduce(function(p, v) { return p + accumulate(v); }, 0)
-                : d.value;
+                ? d.__value = getChildren(d).reduce(function(p, v) { return p + accumulate(v); }, 0)
+                : getValueInternal(d);
         }
 
         // Compute the treemap layout recursively such that each group of siblings
@@ -130,7 +138,7 @@ nv.models.treemap = function() {
                 .attr("class", "nv-treemap-parent")
                 .call(rect)
                 .append("title")
-                .text(function(d) { return formatNumber(d.value); });
+                .text(function(d) { return formatNumber(getValueInternal(d)); });
 
             g.append("text")
                 .attr("class", "nv-treemap-text")
@@ -220,6 +228,12 @@ nv.models.treemap = function() {
   chart.label = function(_) {
     if (!arguments.length) return getLabel;
     getLabel = _;
+    return chart;
+  };
+
+  chart.value = function(_) {
+    if (!arguments.length) return getValue;
+    getValue = _;
     return chart;
   };
 

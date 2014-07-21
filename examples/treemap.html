@@ -30,14 +30,16 @@ d3.json('flare.json', function (root) {
             var width = nv.utils.windowSize().width - 40,
                 height = nv.utils.windowSize().height - 40,
                 margin = {top: 20, right: 0, bottom: 0, left: 0},
-                label = function (d) { return d.name; },
-                children = function (d) { return d.children; };
+                label = function (d) { return d.key; },
+                value = function (d) { return d.val; },
+                children = function (d) { return d.vals; };
 
             var chart = nv.models.treemap()
                 .width(width)
                 .height(height)
                 .margin(margin)
                 .label(label)
+                .value(value)
                 .children(children);
 
             d3.select("#test1")
@@ -56,8 +58,9 @@ d3.json('flare.json', function (root) {
                 var width = nv.utils.windowSize().width - 40,
                 height = nv.utils.windowSize().height - 40,
                 margin = graph.margin(),
-                label = function (d) { return d.name; },
-                children = function (d) { return d.children; };
+                label = function (d) { return d.key; },
+                value = function (d) { return d.val; },
+                children = function (d) { return d.vals; };
 
                 if (width < margin.left + margin.right + 20)
                 width = margin.left + margin.right + 20;
@@ -70,6 +73,7 @@ d3.json('flare.json', function (root) {
                 .height(height)
                 .margin(margin)
                 .label(label)
+                .value(value)
                 .children(children);
 
                 d3.select('#test1')
