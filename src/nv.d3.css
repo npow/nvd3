@@ -355,6 +355,51 @@ svg .title {
   stroke-opacity: 0;
 }
 
+/***********
+*  TreeMap
+*/
+.nv-treemap-text {
+  font: 12px sans-serif;
+  pointer-events: none;
+}
+
+.nv-treemap-grandparent text {
+  font-weight: bold;
+}
+
+rect.nv-treemap-parent,
+.nv-treemap-grandparent rect {
+  stroke-width: 2px;
+}
+
+.nv-treemap-grandparent rect {
+  fill: orange;
+}
+
+.nv-treemap-grandparent:hover rect {
+  fill: #ee9700;
+}
+
+.nv-treemap-parent,
+.nv-treemap-child {
+  fill: none;
+  stroke: #fff;
+}
+
+.nv-treemap-children rect.nv-treemap-parent,
+.nv-treemap-grandparent rect {
+  cursor: pointer;
+}
+
+.nv-treemap-children rect.nv-treemap-parent {
+  fill: #bbb;
+  fill-opacity: .5;
+}
+
+.nv-treemap-children:hover rect.nv-treemap-child {
+  fill: #bbb;
+}
+
 /**********
 * Lines
 */

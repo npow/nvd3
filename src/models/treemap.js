@@ -46,13 +46,14 @@ nv.models.treemap = function() {
             .style("shape-rendering", "crispEdges");
 
         var grandparent = svg.append("g")
-            .attr("class", "grandparent");
+            .attr("class", "nv-treemap-grandparent");
             grandparent.append("rect")
                 .attr("y", -margin.top)
                 .attr("width", width)
                 .attr("height", margin.top);
 
         grandparent.append("text")
+            .attr("class", "nv-treemap-text")
             .attr("x", 6)
             .attr("y", 6 - margin.top)
             .attr("dy", ".75em");
@@ -107,31 +108,32 @@ nv.models.treemap = function() {
                 .select("text")
                 .text(label(d));
 
-            var g1 = svg.insert("g", ".grandparent")
+            var g1 = svg.insert("g", ".nv-treemap-grandparent")
                 .datum(d)
-                .attr("class", "depth");
+                .attr("class", "nv-treemap-depth");
 
             var g = g1.selectAll("g")
                 .data(d._children)
                 .enter().append("g");
 
             g.filter(function(d) { return d._children; })
-                .classed("children", true)
+                .classed("nv-treemap-children", true)
                 .on("click", transition);
 
-            g.selectAll(".child")
+            g.selectAll(".nv-treemap-child")
                 .data(function(d) { return d._children || [d]; })
                 .enter().append("rect")
-                .attr("class", "child")
+                .attr("class", "nv-treemap-child")
                 .call(rect);
 
             g.append("rect")
-                .attr("class", "parent")
+                .attr("class", "nv-treemap-parent")
                 .call(rect)
                 .append("title")
                 .text(function(d) { return formatNumber(d.value); });
 
             g.append("text")
+                .attr("class", "nv-treemap-text")
                 .attr("dy", ".75em")
                 .text(getLabel)
                 .call(text);
@@ -152,7 +154,7 @@ nv.models.treemap = function() {
                 svg.style("shape-rendering", null);
 
                 // Draw child nodes on top of parent nodes.
-                svg.selectAll(".depth").sort(function(a, b) { return a.depth - b.depth; });
+                svg.selectAll(".nv-treemap-depth").sort(function(a, b) { return a.depth - b.depth; });
 
                 // Fade-in entering text.
                 g2.selectAll("text").style("fill-opacity", 0);
