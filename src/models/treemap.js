@@ -47,6 +47,8 @@ nv.models.treemap = function() {
         var svg = container
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.bottom + margin.top)
+            .style('width', width + 'px')
+            .style('height', height + 'px')
             .style("margin-left", -margin.left + "px")
             .style("margin.right", -margin.right + "px")
           .append("g")

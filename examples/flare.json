@@ -1,379 +1,379 @@
 {
- "key": "flare",
- "vals": [
+ "myname": "flare",
+ "mychildren": [
   {
-   "key": "analytics",
-   "vals": [
+   "myname": "analytics",
+   "mychildren": [
     {
-     "key": "cluster",
-     "vals": [
-      {"key": "AgglomerativeCluster", "val": 3938},
-      {"key": "CommunityStructure", "val": 3812},
-      {"key": "HierarchicalCluster", "val": 6714},
-      {"key": "MergeEdge", "val": 743}
+     "myname": "cluster",
+     "mychildren": [
+      {"myname": "AgglomerativeCluster", "mysize": 3938},
+      {"myname": "CommunityStructure", "mysize": 3812},
+      {"myname": "HierarchicalCluster", "mysize": 6714},
+      {"myname": "MergeEdge", "mysize": 743}
      ]
     },
     {
-     "key": "graph",
-     "vals": [
-      {"key": "BetweennessCentrality", "val": 3534},
-      {"key": "LinkDistance", "val": 5731},
-      {"key": "MaxFlowMinCut", "val": 7840},
-      {"key": "ShortestPaths", "val": 5914},
-      {"key": "SpanningTree", "val": 3416}
+     "myname": "graph",
+     "mychildren": [
+      {"myname": "BetweennessCentrality", "mysize": 3534},
+      {"myname": "LinkDistance", "mysize": 5731},
+      {"myname": "MaxFlowMinCut", "mysize": 7840},
+      {"myname": "ShortestPaths", "mysize": 5914},
+      {"myname": "SpanningTree", "mysize": 3416}
      ]
     },
     {
-     "key": "optimization",
-     "vals": [
-      {"key": "AspectRatioBanker", "val": 7074}
+     "myname": "optimization",
+     "mychildren": [
+      {"myname": "AspectRatioBanker", "mysize": 7074}
      ]
     }
    ]
   },
   {
-   "key": "animate",
-   "vals": [
-    {"key": "Easing", "val": 17010},
-    {"key": "FunctionSequence", "val": 5842},
+   "myname": "animate",
+   "mychildren": [
+    {"myname": "Easing", "mysize": 17010},
+    {"myname": "FunctionSequence", "mysize": 5842},
     {
-     "key": "interpolate",
-     "vals": [
-      {"key": "ArrayInterpolator", "val": 1983},
-      {"key": "ColorInterpolator", "val": 2047},
-      {"key": "DateInterpolator", "val": 1375},
-      {"key": "Interpolator", "val": 8746},
-      {"key": "MatrixInterpolator", "val": 2202},
-      {"key": "NumberInterpolator", "val": 1382},
-      {"key": "ObjectInterpolator", "val": 1629},
-      {"key": "PointInterpolator", "val": 1675},
-      {"key": "RectangleInterpolator", "val": 2042}
+     "myname": "interpolate",
+     "mychildren": [
+      {"myname": "ArrayInterpolator", "mysize": 1983},
+      {"myname": "ColorInterpolator", "mysize": 2047},
+      {"myname": "DateInterpolator", "mysize": 1375},
+      {"myname": "Interpolator", "mysize": 8746},
+      {"myname": "MatrixInterpolator", "mysize": 2202},
+      {"myname": "NumberInterpolator", "mysize": 1382},
+      {"myname": "ObjectInterpolator", "mysize": 1629},
+      {"myname": "PointInterpolator", "mysize": 1675},
+      {"myname": "RectangleInterpolator", "mysize": 2042}
      ]
     },
-    {"key": "ISchedulable", "val": 1041},
-    {"key": "Parallel", "val": 5176},
-    {"key": "Pause", "val": 449},
-    {"key": "Scheduler", "val": 5593},
-    {"key": "Sequence", "val": 5534},
-    {"key": "Transition", "val": 9201},
-    {"key": "Transitioner", "val": 19975},
-    {"key": "TransitionEvent", "val": 1116},
-    {"key": "Tween", "val": 6006}
+    {"myname": "ISchedulable", "mysize": 1041},
+    {"myname": "Parallel", "mysize": 5176},
+    {"myname": "Pause", "mysize": 449},
+    {"myname": "Scheduler", "mysize": 5593},
+    {"myname": "Sequence", "mysize": 5534},
+    {"myname": "Transition", "mysize": 9201},
+    {"myname": "Transitioner", "mysize": 19975},
+    {"myname": "TransitionEvent", "mysize": 1116},
+    {"myname": "Tween", "mysize": 6006}
    ]
   },
   {
-   "key": "data",
-   "vals": [
+   "myname": "data",
+   "mychildren": [
     {
-     "key": "converters",
-     "vals": [
-      {"key": "Converters", "val": 721},
-      {"key": "DelimitedTextConverter", "val": 4294},
-      {"key": "GraphMLConverter", "val": 9800},
-      {"key": "IDataConverter", "val": 1314},
-      {"key": "JSONConverter", "val": 2220}
+     "myname": "converters",
+     "mychildren": [
+      {"myname": "Converters", "mysize": 721},
+      {"myname": "DelimitedTextConverter", "mysize": 4294},
+      {"myname": "GraphMLConverter", "mysize": 9800},
+      {"myname": "IDataConverter", "mysize": 1314},
+      {"myname": "JSONConverter", "mysize": 2220}
      ]
     },
-    {"key": "DataField", "val": 1759},
-    {"key": "DataSchema", "val": 2165},
-    {"key": "DataSet", "val": 586},
-    {"key": "DataSource", "val": 3331},
-    {"key": "DataTable", "val": 772},
-    {"key": "DataUtil", "val": 3322}
+    {"myname": "DataField", "mysize": 1759},
+    {"myname": "DataSchema", "mysize": 2165},
+    {"myname": "DataSet", "mysize": 586},
+    {"myname": "DataSource", "mysize": 3331},
+    {"myname": "DataTable", "mysize": 772},
+    {"myname": "DataUtil", "mysize": 3322}
    ]
   },
   {
-   "key": "display",
-   "vals": [
-    {"key": "DirtySprite", "val": 8833},
-    {"key": "LineSprite", "val": 1732},
-    {"key": "RectSprite", "val": 3623},
-    {"key": "TextSprite", "val": 10066}
+   "myname": "display",
+   "mychildren": [
+    {"myname": "DirtySprite", "mysize": 8833},
+    {"myname": "LineSprite", "mysize": 1732},
+    {"myname": "RectSprite", "mysize": 3623},
+    {"myname": "TextSprite", "mysize": 10066}
    ]
   },
   {
-   "key": "flex",
-   "vals": [
-    {"key": "FlareVis", "val": 4116}
+   "myname": "flex",
+   "mychildren": [
+    {"myname": "FlareVis", "mysize": 4116}
    ]
   },
   {
-   "key": "physics",
-   "vals": [
-    {"key": "DragForce", "val": 1082},
-    {"key": "GravityForce", "val": 1336},
-    {"key": "IForce", "val": 319},
-    {"key": "NBodyForce", "val": 10498},
-    {"key": "Particle", "val": 2822},
-    {"key": "Simulation", "val": 9983},
-    {"key": "Spring", "val": 2213},
-    {"key": "SpringForce", "val": 1681}
+   "myname": "physics",
+   "mychildren": [
+    {"myname": "DragForce", "mysize": 1082},
+    {"myname": "GravityForce", "mysize": 1336},
+    {"myname": "IForce", "mysize": 319},
+    {"myname": "NBodyForce", "mysize": 10498},
+    {"myname": "Particle", "mysize": 2822},
+    {"myname": "Simulation", "mysize": 9983},
+    {"myname": "Spring", "mysize": 2213},
+    {"myname": "SpringForce", "mysize": 1681}
    ]
   },
   {
-   "key": "query",
-   "vals": [
-    {"key": "AggregateExpression", "val": 1616},
-    {"key": "And", "val": 1027},
-    {"key": "Arithmetic", "val": 3891},
-    {"key": "Average", "val": 891},
-    {"key": "BinaryExpression", "val": 2893},
-    {"key": "Comparison", "val": 5103},
-    {"key": "CompositeExpression", "val": 3677},
-    {"key": "Count", "val": 781},
-    {"key": "DateUtil", "val": 4141},
-    {"key": "Distinct", "val": 933},
-    {"key": "Expression", "val": 5130},
-    {"key": "ExpressionIterator", "val": 3617},
-    {"key": "Fn", "val": 3240},
-    {"key": "If", "val": 2732},
-    {"key": "IsA", "val": 2039},
-    {"key": "Literal", "val": 1214},
-    {"key": "Match", "val": 3748},
-    {"key": "Maximum", "val": 843},
+   "myname": "query",
+   "mychildren": [
+    {"myname": "AggregateExpression", "mysize": 1616},
+    {"myname": "And", "mysize": 1027},
+    {"myname": "Arithmetic", "mysize": 3891},
+    {"myname": "Average", "mysize": 891},
+    {"myname": "BinaryExpression", "mysize": 2893},
+    {"myname": "Comparison", "mysize": 5103},
+    {"myname": "CompositeExpression", "mysize": 3677},
+    {"myname": "Count", "mysize": 781},
+    {"myname": "DateUtil", "mysize": 4141},
+    {"myname": "Distinct", "mysize": 933},
+    {"myname": "Expression", "mysize": 5130},
+    {"myname": "ExpressionIterator", "mysize": 3617},
+    {"myname": "Fn", "mysize": 3240},
+    {"myname": "If", "mysize": 2732},
+    {"myname": "IsA", "mysize": 2039},
+    {"myname": "Literal", "mysize": 1214},
+    {"myname": "Match", "mysize": 3748},
+    {"myname": "Maximum", "mysize": 843},
     {
-     "key": "methods",
-     "vals": [
-      {"key": "add", "val": 593},
-      {"key": "and", "val": 330},
-      {"key": "average", "val": 287},
-      {"key": "count", "val": 277},
-      {"key": "distinct", "val": 292},
-      {"key": "div", "val": 595},
-      {"key": "eq", "val": 594},
-      {"key": "fn", "val": 460},
-      {"key": "gt", "val": 603},
-      {"key": "gte", "val": 625},
-      {"key": "iff", "val": 748},
-      {"key": "isa", "val": 461},
-      {"key": "lt", "val": 597},
-      {"key": "lte", "val": 619},
-      {"key": "max", "val": 283},
-      {"key": "min", "val": 283},
-      {"key": "mod", "val": 591},
-      {"key": "mul", "val": 603},
-      {"key": "neq", "val": 599},
-      {"key": "not", "val": 386},
-      {"key": "or", "val": 323},
-      {"key": "orderby", "val": 307},
-      {"key": "range", "val": 772},
-      {"key": "select", "val": 296},
-      {"key": "stddev", "val": 363},
-      {"key": "sub", "val": 600},
-      {"key": "sum", "val": 280},
-      {"key": "update", "val": 307},
-      {"key": "variance", "val": 335},
-      {"key": "where", "val": 299},
-      {"key": "xor", "val": 354},
-      {"key": "_", "val": 264}
+     "myname": "methods",
+     "mychildren": [
+      {"myname": "add", "mysize": 593},
+      {"myname": "and", "mysize": 330},
+      {"myname": "average", "mysize": 287},
+      {"myname": "count", "mysize": 277},
+      {"myname": "distinct", "mysize": 292},
+      {"myname": "div", "mysize": 595},
+      {"myname": "eq", "mysize": 594},
+      {"myname": "fn", "mysize": 460},
+      {"myname": "gt", "mysize": 603},
+      {"myname": "gte", "mysize": 625},
+      {"myname": "iff", "mysize": 748},
+      {"myname": "isa", "mysize": 461},
+      {"myname": "lt", "mysize": 597},
+      {"myname": "lte", "mysize": 619},
+      {"myname": "max", "mysize": 283},
+      {"myname": "min", "mysize": 283},
+      {"myname": "mod", "mysize": 591},
+      {"myname": "mul", "mysize": 603},
+      {"myname": "neq", "mysize": 599},
+      {"myname": "not", "mysize": 386},
+      {"myname": "or", "mysize": 323},
+      {"myname": "orderby", "mysize": 307},
+      {"myname": "range", "mysize": 772},
+      {"myname": "select", "mysize": 296},
+      {"myname": "stddev", "mysize": 363},
+      {"myname": "sub", "mysize": 600},
+      {"myname": "sum", "mysize": 280},
+      {"myname": "update", "mysize": 307},
+      {"myname": "variance", "mysize": 335},
+      {"myname": "where", "mysize": 299},
+      {"myname": "xor", "mysize": 354},
+      {"myname": "_", "mysize": 264}
      ]
     },
-    {"key": "Minimum", "val": 843},
-    {"key": "Not", "val": 1554},
-    {"key": "Or", "val": 970},
-    {"key": "Query", "val": 13896},
-    {"key": "Range", "val": 1594},
-    {"key": "StringUtil", "val": 4130},
-    {"key": "Sum", "val": 791},
-    {"key": "Variable", "val": 1124},
-    {"key": "Variance", "val": 1876},
-    {"key": "Xor", "val": 1101}
+    {"myname": "Minimum", "mysize": 843},
+    {"myname": "Not", "mysize": 1554},
+    {"myname": "Or", "mysize": 970},
+    {"myname": "Query", "mysize": 13896},
+    {"myname": "Range", "mysize": 1594},
+    {"myname": "StringUtil", "mysize": 4130},
+    {"myname": "Sum", "mysize": 791},
+    {"myname": "Variable", "mysize": 1124},
+    {"myname": "Variance", "mysize": 1876},
+    {"myname": "Xor", "mysize": 1101}
    ]
   },
   {
-   "key": "scale",
-   "vals": [
-    {"key": "IScaleMap", "val": 2105},
-    {"key": "LinearScale", "val": 1316},
-    {"key": "LogScale", "val": 3151},
-    {"key": "OrdinalScale", "val": 3770},
-    {"key": "QuantileScale", "val": 2435},
-    {"key": "QuantitativeScale", "val": 4839},
-    {"key": "RootScale", "val": 1756},
-    {"key": "Scale", "val": 4268},
-    {"key": "ScaleType", "val": 1821},
-    {"key": "TimeScale", "val": 5833}
+   "myname": "scale",
+   "mychildren": [
+    {"myname": "IScaleMap", "mysize": 2105},
+    {"myname": "LinearScale", "mysize": 1316},
+    {"myname": "LogScale", "mysize": 3151},
+    {"myname": "OrdinalScale", "mysize": 3770},
+    {"myname": "QuantileScale", "mysize": 2435},
+    {"myname": "QuantitativeScale", "mysize": 4839},
+    {"myname": "RootScale", "mysize": 1756},
+    {"myname": "Scale", "mysize": 4268},
+    {"myname": "ScaleType", "mysize": 1821},
+    {"myname": "TimeScale", "mysize": 5833}
    ]
   },
   {
-   "key": "util",
-   "vals": [
-    {"key": "Arrays", "val": 8258},
-    {"key": "Colors", "val": 10001},
-    {"key": "Dates", "val": 8217},
-    {"key": "Displays", "val": 12555},
-    {"key": "Filter", "val": 2324},
-    {"key": "Geometry", "val": 10993},
+   "myname": "util",
+   "mychildren": [
+    {"myname": "Arrays", "mysize": 8258},
+    {"myname": "Colors", "mysize": 10001},
+    {"myname": "Dates", "mysize": 8217},
+    {"myname": "Displays", "mysize": 12555},
+    {"myname": "Filter", "mysize": 2324},
+    {"myname": "Geometry", "mysize": 10993},
     {
-     "key": "heap",
-     "vals": [
-      {"key": "FibonacciHeap", "val": 9354},
-      {"key": "HeapNode", "val": 1233}
+     "myname": "heap",
+     "mychildren": [
+      {"myname": "FibonacciHeap", "mysize": 9354},
+      {"myname": "HeapNode", "mysize": 1233}
      ]
     },
-    {"key": "IEvaluable", "val": 335},
-    {"key": "IPredicate", "val": 383},
-    {"key": "IValueProxy", "val": 874},
+    {"myname": "IEvaluable", "mysize": 335},
+    {"myname": "IPredicate", "mysize": 383},
+    {"myname": "IValueProxy", "mysize": 874},
     {
-     "key": "math",
-     "vals": [
-      {"key": "DenseMatrix", "val": 3165},
-      {"key": "IMatrix", "val": 2815},
-      {"key": "SparseMatrix", "val": 3366}
+     "myname": "math",
+     "mychildren": [
+      {"myname": "DenseMatrix", "mysize": 3165},
+      {"myname": "IMatrix", "mysize": 2815},
+      {"myname": "SparseMatrix", "mysize": 3366}
      ]
     },
-    {"key": "Maths", "val": 17705},
-    {"key": "Orientation", "val": 1486},
+    {"myname": "Maths", "mysize": 17705},
+    {"myname": "Orientation", "mysize": 1486},
     {
-     "key": "palette",
-     "vals": [
-      {"key": "ColorPalette", "val": 6367},
-      {"key": "Palette", "val": 1229},
-      {"key": "ShapePalette", "val": 2059},
-      {"key": "SizePalette", "val": 2291}
+     "myname": "palette",
+     "mychildren": [
+      {"myname": "ColorPalette", "mysize": 6367},
+      {"myname": "Palette", "mysize": 1229},
+      {"myname": "ShapePalette", "mysize": 2059},
+      {"myname": "SizePalette", "mysize": 2291}
      ]
     },
-    {"key": "Property", "val": 5559},
-    {"key": "Shapes", "val": 19118},
-    {"key": "Sort", "val": 6887},
-    {"key": "Stats", "val": 6557},
-    {"key": "Strings", "val": 22026}
+    {"myname": "Property", "mysize": 5559},
+    {"myname": "Shapes", "mysize": 19118},
+    {"myname": "Sort", "mysize": 6887},
+    {"myname": "Stats", "mysize": 6557},
+    {"myname": "Strings", "mysize": 22026}
    ]
   },
   {
-   "key": "vis",
-   "vals": [
+   "myname": "vis",
+   "mychildren": [
     {
-     "key": "axis",
-     "vals": [
-      {"key": "Axes", "val": 1302},
-      {"key": "Axis", "val": 24593},
-      {"key": "AxisGridLine", "val": 652},
-      {"key": "AxisLabel", "val": 636},
-      {"key": "CartesianAxes", "val": 6703}
+     "myname": "axis",
+     "mychildren": [
+      {"myname": "Axes", "mysize": 1302},
+      {"myname": "Axis", "mysize": 24593},
+      {"myname": "AxisGridLine", "mysize": 652},
+      {"myname": "AxisLabel", "mysize": 636},
+      {"myname": "CartesianAxes", "mysize": 6703}
      ]
     },
     {
-     "key": "controls",
-     "vals": [
-      {"key": "AnchorControl", "val": 2138},
-      {"key": "ClickControl", "val": 3824},
-      {"key": "Control", "val": 1353},
-      {"key": "ControlList", "val": 4665},
-      {"key": "DragControl", "val": 2649},
-      {"key": "ExpandControl", "val": 2832},
-      {"key": "HoverControl", "val": 4896},
-      {"key": "IControl", "val": 763},
-      {"key": "PanZoomControl", "val": 5222},
-      {"key": "SelectionControl", "val": 7862},
-      {"key": "TooltipControl", "val": 8435}
+     "myname": "controls",
+     "mychildren": [
+      {"myname": "AnchorControl", "mysize": 2138},
+      {"myname": "ClickControl", "mysize": 3824},
+      {"myname": "Control", "mysize": 1353},
+      {"myname": "ControlList", "mysize": 4665},
+      {"myname": "DragControl", "mysize": 2649},
+      {"myname": "ExpandControl", "mysize": 2832},
+      {"myname": "HoverControl", "mysize": 4896},
+      {"myname": "IControl", "mysize": 763},
+      {"myname": "PanZoomControl", "mysize": 5222},
+      {"myname": "SelectionControl", "mysize": 7862},
+      {"myname": "TooltipControl", "mysize": 8435}
      ]
     },
     {
-     "key": "data",
-     "vals": [
-      {"key": "Data", "val": 20544},
-      {"key": "DataList", "val": 19788},
-      {"key": "DataSprite", "val": 10349},
-      {"key": "EdgeSprite", "val": 3301},
-      {"key": "NodeSprite", "val": 19382},
+     "myname": "data",
+     "mychildren": [
+      {"myname": "Data", "mysize": 20544},
+      {"myname": "DataList", "mysize": 19788},
+      {"myname": "DataSprite", "mysize": 10349},
+      {"myname": "EdgeSprite", "mysize": 3301},
+      {"myname": "NodeSprite", "mysize": 19382},
       {
-       "key": "render",
-       "vals": [
-        {"key": "ArrowType", "val": 698},
-        {"key": "EdgeRenderer", "val": 5569},
-        {"key": "IRenderer", "val": 353},
-        {"key": "ShapeRenderer", "val": 2247}
+       "myname": "render",
+       "mychildren": [
+        {"myname": "ArrowType", "mysize": 698},
+        {"myname": "EdgeRenderer", "mysize": 5569},
+        {"myname": "IRenderer", "mysize": 353},
+        {"myname": "ShapeRenderer", "mysize": 2247}
        ]
       },
-      {"key": "ScaleBinding", "val": 11275},
-      {"key": "Tree", "val": 7147},
-      {"key": "TreeBuilder", "val": 9930}
+      {"myname": "ScaleBinding", "mysize": 11275},
+      {"myname": "Tree", "mysize": 7147},
+      {"myname": "TreeBuilder", "mysize": 9930}
      ]
     },
     {
-     "key": "events",
-     "vals": [
-      {"key": "DataEvent", "val": 2313},
-      {"key": "SelectionEvent", "val": 1880},
-      {"key": "TooltipEvent", "val": 1701},
-      {"key": "VisualizationEvent", "val": 1117}
+     "myname": "events",
+     "mychildren": [
+      {"myname": "DataEvent", "mysize": 2313},
+      {"myname": "SelectionEvent", "mysize": 1880},
+      {"myname": "TooltipEvent", "mysize": 1701},
+      {"myname": "VisualizationEvent", "mysize": 1117}
      ]
     },
     {
-     "key": "legend",
-     "vals": [
-      {"key": "Legend", "val": 20859},
-      {"key": "LegendItem", "val": 4614},
-      {"key": "LegendRange", "val": 10530}
+     "myname": "legend",
+     "mychildren": [
+      {"myname": "Legend", "mysize": 20859},
+      {"myname": "LegendItem", "mysize": 4614},
+      {"myname": "LegendRange", "mysize": 10530}
      ]
     },
     {
-     "key": "operator",
-     "vals": [
+     "myname": "operator",
+     "mychildren": [
       {
-       "key": "distortion",
-       "vals": [
-        {"key": "BifocalDistortion", "val": 4461},
-        {"key": "Distortion", "val": 6314},
-        {"key": "FisheyeDistortion", "val": 3444}
-       ]
-      },
-      {
-       "key": "encoder",
-       "vals": [
-        {"key": "ColorEncoder", "val": 3179},
-        {"key": "Encoder", "val": 4060},
-        {"key": "PropertyEncoder", "val": 4138},
-        {"key": "ShapeEncoder", "val": 1690},
-        {"key": "SizeEncoder", "val": 1830}
+       "myname": "distortion",
+       "mychildren": [
+        {"myname": "BifocalDistortion", "mysize": 4461},
+        {"myname": "Distortion", "mysize": 6314},
+        {"myname": "FisheyeDistortion", "mysize": 3444}
        ]
       },
       {
-       "key": "filter",
-       "vals": [
-        {"key": "FisheyeTreeFilter", "val": 5219},
-        {"key": "GraphDistanceFilter", "val": 3165},
-        {"key": "VisibilityFilter", "val": 3509}
-       ]
-      },
-      {"key": "IOperator", "val": 1286},
-      {
-       "key": "label",
-       "vals": [
-        {"key": "Labeler", "val": 9956},
-        {"key": "RadialLabeler", "val": 3899},
-        {"key": "StackedAreaLabeler", "val": 3202}
+       "myname": "encoder",
+       "mychildren": [
+        {"myname": "ColorEncoder", "mysize": 3179},
+        {"myname": "Encoder", "mysize": 4060},
+        {"myname": "PropertyEncoder", "mysize": 4138},
+        {"myname": "ShapeEncoder", "mysize": 1690},
+        {"myname": "SizeEncoder", "mysize": 1830}
        ]
       },
       {
-       "key": "layout",
-       "vals": [
-        {"key": "AxisLayout", "val": 6725},
-        {"key": "BundledEdgeRouter", "val": 3727},
-        {"key": "CircleLayout", "val": 9317},
-        {"key": "CirclePackingLayout", "val": 12003},
-        {"key": "DendrogramLayout", "val": 4853},
-        {"key": "ForceDirectedLayout", "val": 8411},
-        {"key": "IcicleTreeLayout", "val": 4864},
-        {"key": "IndentedTreeLayout", "val": 3174},
-        {"key": "Layout", "val": 7881},
-        {"key": "NodeLinkTreeLayout", "val": 12870},
-        {"key": "PieLayout", "val": 2728},
-        {"key": "RadialTreeLayout", "val": 12348},
-        {"key": "RandomLayout", "val": 870},
-        {"key": "StackedAreaLayout", "val": 9121},
-        {"key": "TreeMapLayout", "val": 9191}
+       "myname": "filter",
+       "mychildren": [
+        {"myname": "FisheyeTreeFilter", "mysize": 5219},
+        {"myname": "GraphDistanceFilter", "mysize": 3165},
+        {"myname": "VisibilityFilter", "mysize": 3509}
        ]
       },
-      {"key": "Operator", "val": 2490},
-      {"key": "OperatorList", "val": 5248},
-      {"key": "OperatorSequence", "val": 4190},
-      {"key": "OperatorSwitch", "val": 2581},
-      {"key": "SortOperator", "val": 2023}
+      {"myname": "IOperator", "mysize": 1286},
+      {
+       "myname": "label",
+       "mychildren": [
+        {"myname": "Labeler", "mysize": 9956},
+        {"myname": "RadialLabeler", "mysize": 3899},
+        {"myname": "StackedAreaLabeler", "mysize": 3202}
+       ]
+      },
+      {
+       "myname": "layout",
+       "mychildren": [
+        {"myname": "AxisLayout", "mysize": 6725},
+        {"myname": "BundledEdgeRouter", "mysize": 3727},
+        {"myname": "CircleLayout", "mysize": 9317},
+        {"myname": "CirclePackingLayout", "mysize": 12003},
+        {"myname": "DendrogramLayout", "mysize": 4853},
+        {"myname": "ForceDirectedLayout", "mysize": 8411},
+        {"myname": "IcicleTreeLayout", "mysize": 4864},
+        {"myname": "IndentedTreeLayout", "mysize": 3174},
+        {"myname": "Layout", "mysize": 7881},
+        {"myname": "NodeLinkTreeLayout", "mysize": 12870},
+        {"myname": "PieLayout", "mysize": 2728},
+        {"myname": "RadialTreeLayout", "mysize": 12348},
+        {"myname": "RandomLayout", "mysize": 870},
+        {"myname": "StackedAreaLayout", "mysize": 9121},
+        {"myname": "TreeMapLayout", "mysize": 9191}
+       ]
+      },
+      {"myname": "Operator", "mysize": 2490},
+      {"myname": "OperatorList", "mysize": 5248},
+      {"myname": "OperatorSequence", "mysize": 4190},
+      {"myname": "OperatorSwitch", "mysize": 2581},
+      {"myname": "SortOperator", "mysize": 2023}
      ]
     },
-    {"key": "Visualization", "val": 16540}
+    {"myname": "Visualization", "mysize": 16540}
    ]
   }
  ]

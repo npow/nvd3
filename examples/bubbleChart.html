@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link href="../src/nv.d3.css" rel="stylesheet" type="text/css">
+<style>
+
+body {
+  overflow-y:scroll;
+  background: black;
+}
+
+#test1 {
+  width: 960px;
+  height: 500px;
+}
+
+</style>
+<body>
+
+<svg id="test1"></svg>
+
+<script src="../lib/d3.v3.js"></script>
+<script src="../nv.d3.js"></script>
+<script src="../src/utils.js"></script>
+<script src="../src/models/bubbleChart.js"></script>
+<script> 
+var color = d3.scale.category20c(),
+    format = d3.format(",d"),
+    getChildren = function(d) { return d.mychildren; },
+    getLabel = function(d) { return d.myname; },
+    getSize = function(d) { return d.mysize; };
+
+d3.json("flare.json", function(error, root) {
+  nv.addGraph({
+    generate: function() {
+      var diameter = nv.utils.windowSize().height - 40;
+
+      var chart = nv.models.bubbleChart()
+        .diameter(diameter)
+        .color(color)
+        .format(format)
+        .children(getChildren)
+        .label(getLabel)
+        .size(getSize);
+
+      d3.select("#test1")
+        .datum(root)
+        .transition().duration(1200)
+        .call(chart);
+
+      return chart;
+    },
+    callback: function(graph) {
+      // TODO: FIXME
+      window.onresize = function() {
+        var diameter = nv.utils.windowSize().height - 40;
+        graph
+          .diameter(diameter);
+
+        d3.select('#test1')
+          .call(graph);
+      };
+    }
+  });
+});
+</script>
