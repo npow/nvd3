@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link href="../src/nv.d3.css" rel="stylesheet" type="text/css">
+<style>
+body {
+  overflow-y:scroll;
+}
+
+text {
+  font: 12px sans-serif;
+}
+
+#container {
+  margin: 10px;
+  min-width: 100px;
+  min-height: 100px;
+}
+
+#container svg {
+  height: 1500px;
+}
+
+</style>
+<body>
+  <select id="vizType"></select>
+  <div id="container" class='with-3d-shadow with-transitions'>
+    <svg></svg>
+  </div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="../lib/d3.v3.js"></script>
+<script src="../nv.d3.js"></script>
+<!--script src="../src/utils.js"></script>
+<script src="../src/tooltip.js"></script>
+<script src="../src/models/legend.js"></script>
+<script src="../src/models/axis.js"></script>
+<script src="../src/models/multiBarHorizontal.js"></script>
+<script src="../src/models/multiBarHorizontalChart.js"></script>
+<script src="../src/models/multiBar.js"></script>
+<script src="../src/models/multiBarChart.js"></script>
+<script src="stream_layers.js"></script-->
+<script>
+var types = ['scatterChart', 'stackedArea', 'multiBarHorizontalChart', 'multiBarChart'];
+types.forEach(function (key) {
+  $('#vizType').append($('<option/>').val(key).text(key));
+});
+
+d3.csv('OlympicAthletes.csv', function (csv) {
+  window.csv = csv;
+  render($('#vizType').val());
+});
+
+function transformData(keys, rollup) {
+  var dim2_keys = {};
+  var data = d3.nest();
+  keys.forEach(function (key) {
+    data = data.key(function (d) { return d[key]; });
+  });
+  if (rollup) {
+    data = data.rollup(rollup);
+  }
+  data = data.entries(csv); //.slice(0,2000));
+
+  data.forEach(function (dim1) {
+    if (dim1.values instanceof Array) {
+      dim1.values.forEach(function (dim2) {
+        if (dim2.key) dim2_keys[dim2.key] = 1;
+      });
+    }
+  });
+  var keys2 = Object.keys(dim2_keys).sort();
+  if (keys2.length > 0) {
+    data.forEach(function (dim1) {
+      var values = keys2.map(function (key) {
+        return {
+          key: key,
+          values: 0
+        };
+      });
+      if (dim1.values instanceof Array) {
+        dim1.values.forEach(function (dim2) {
+          var idx = keys2.indexOf(dim2.key);
+          if (idx > -1) {
+            values[idx].values = dim2.values;
+          }
+        });
+        dim1.values = values;
+      }
+    });
+  }
+
+  return data;
+}
+
+function multiBarChart() {
+  var chart = nv.models.multiBarChart()
+      .x(function(d) { return d.key })
+      .y(function(d) { return d.values })
+      .margin({top: 30, right: 20, bottom: 50, left: 175})
+//        .showValues(false)
+      .tooltips(true)
+      .transitionDuration(250)
+      .stacked(true)
+      .showControls(true);
+
+  var data = transformData(['Country', 'Sport'], function (d) { return d3.sum(d, function (g) { return g['Gold Medals']; }); });
+  d3.select('#container svg')
+      .datum(data)
+      .call(chart);
+
+  nv.utils.windowResize(chart.update);
+
+  return chart;
+}
+
+function multiBarHorizontalChart() {
+  var chart = nv.models.multiBarHorizontalChart()
+      .x(function(d) { return d.key })
+      .y(function(d) { return d.values })
+      .margin({top: 30, right: 20, bottom: 50, left: 175})
+//        .showValues(false)
+      .tooltips(true)
+      .transitionDuration(250)
+      .stacked(true)
+      .showControls(true);
+
+  var data = transformData(['Country', 'Sport'], function (d) { return d3.sum(d, function (g) { return g['Gold Medals']; }); });
+  d3.select('#container svg')
+      .datum(data)
+      .call(chart);
+
+  nv.utils.windowResize(chart.update);
+
+  return chart;
+}
+
+function stackedArea() {
+  var data = transformData(['Country', 'Sport'], function (d) { return d3.sum(d, function (g) { return g['Gold Medals']; }); });
+
+  var sports = [];
+  data[0].values.forEach(function (o) {
+    sports.push(o.key);
+  });
+
+  var width = nv.utils.windowSize().width - 100,
+      height = nv.utils.windowSize().height - 20;
+
+  var chart = nv.models.stackedAreaChart()
+              .width(width)
+              .height(height)
+              .x(function(d) { return sports.indexOf(d.key); })
+              .y(function(d) { return d.values })
+//              .offset('wiggle')
+//              .order('default')
+
+  chart.xAxis.tickFormat(function(d) { return sports[d]; });
+
+  var svg = d3.select('#container svg')
+    .attr('width', width)
+    .attr('height', height)
+    .datum(data)
+
+  svg.transition().duration(500).call(chart);
+  return chart;
+}
+
+function scatterChart() {
+  var rollup = function (d) {
+    return {
+      'Total Gold Medals': d3.sum(d, function (g) { return g['Gold Medals']; }),
+      'Total Silver Medals': d3.sum(d, function (g) { return g['Silver Medals']; }),
+      'Total Medals': d3.sum(d, function (g) { return g['Total Medals']; })
+    };
+  };
+  var data = transformData(['Country', 'Sport'], rollup);
+
+  var width = nv.utils.windowSize().width - 100,
+      height = nv.utils.windowSize().height - 20;
+
+  var chart = nv.models.scatterChart()
+              .width(width)
+              .height(height)
+              .x(function(d) { return d.values['Total Gold Medals'] || 0; })
+              .y(function(d) { return d.values['Total Silver Medals'] || 0; })
+              .size(function (d) { return d.values['Total Medals'] || 0; })
+              .useVoronoi(false)
+              .showDistX(true)
+              .showDistY(true)
+
+    chart.xAxis.tickFormat(d3.format('.0f')).axisLabel('Total Gold Medals');
+    chart.yAxis.tickFormat(d3.format('.0f')).axisLabel('Total Silver Medals');
+    chart.tooltipContent(function(key, x, y, o, fn) {
+        return '<h2>' + key + ': ' + o.point.key + '</h2>';
+    });
+
+  var svg = d3.select('#container svg')
+    .attr('width', width)
+    .attr('height', height)
+    .datum(data)
+
+  svg.transition().duration(500).call(chart);
+  return chart;
+}
+
+function render(type) {
+  $('#container svg').empty();
+  var chart;
+  nv.addGraph(function() {
+    var chart = eval(type + '()');
+    return chart;
+  });
+}
+
+$(document).ready(function () {
+  $('#vizType').change(function () {
+    var type = $(this).val();
+    render(type);
+  });
+});
+
+</script>
