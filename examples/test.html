@@ -2,6 +2,7 @@
 <meta charset="utf-8">
 <link href="../src/nv.d3.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
+<link rel="stylesheet" type="text/css" href="../d3.parsets.css">
 <style>
 body,html {
   overflow-y:scroll;
@@ -28,6 +29,7 @@ text {
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="../lib/d3.v3.js"></script>
 <script src="../lib/d3.parcoords.js"></script>
+<script src="../lib/d3.parsets.js"></script>
 <script src="../nv.d3.js"></script>
 <!--script src="../src/utils.js"></script>
 <script src="../src/tooltip.js"></script>
@@ -39,7 +41,7 @@ text {
 <script src="../src/models/multiBarChart.js"></script>
 <script src="stream_layers.js"></script-->
 <script>
-var types = ['timeBubbles', 'parallelCoordinates', 'scatterChart', 'stackedArea', 'multiBarHorizontalChart', 'multiBarChart'];
+var types = ['parallelSets', 'timeBubbles', 'parallelCoordinates', 'scatterChart', 'stackedArea', 'multiBarHorizontalChart', 'multiBarChart'];
 types.forEach(function (key) {
   $('#vizType').append($('<option/>').val(key).text(key));
 });
@@ -304,6 +306,32 @@ function truncate(str, maxLength, suffix) {
 	return str;
 }
 
+function parallelSets() {
+  var rollup = function (d) {
+    var measures = ['Gold Medals', 'Silver Medals', 'Bronze Medals', 'Total Medals'];
+    var o = {};
+    measures.forEach(function (measure) {
+      o['Sum ' + measure] = d3.sum(d, function (g) { return +g[measure]; });
+      o['Mean ' + measure] = d3.mean(d, function (g) { return +g[measure]; });
+    });
+    return [o];
+  };
+  var data = csv;//transformData(['Country'], rollup);
+
+  var width = nv.utils.windowSize().width;
+  var height = nv.utils.windowSize().height - 100;
+  var chart = d3.parsets()
+  .dimensions(['Year', 'Country'])
+  .height(height)
+  .width(width);
+
+  var vis = d3.select("#container svg")
+      .attr("width", chart.width())
+      .attr("height", chart.height() + 50);
+
+  vis.datum(data).call(chart);
+}
+
 function timeBubbles() {
   var rollup = function (d) {
     var measures = ['Gold Medals', 'Silver Medals', 'Bronze Medals', 'Total Medals'];
@@ -319,7 +347,7 @@ function timeBubbles() {
 
   var margin = {top: 20, right: 200, bottom: 0, left: 20},
     width = nv.utils.windowSize().width - 300,
-    height = nv.utils.windowSize().height * 2.5;
+    height = nv.utils.windowSize().height * 3;
 
   var yearExtent = d3.extent(csv, function (d) { return +d['Year']; });
   var start_year = yearExtent[0];
