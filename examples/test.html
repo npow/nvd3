@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <link href="../src/nv.d3.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
 <style>
-body {
+body,html {
   overflow-y:scroll;
+  width: 100%;
+  height: 100%;
 }
 
 text {
@@ -16,10 +19,6 @@ text {
   min-height: 100px;
 }
 
-#container svg {
-  height: 1500px;
-}
-
 </style>
 <body>
   <select id="vizType"></select>
@@ -28,6 +27,7 @@ text {
   </div>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="../lib/d3.v3.js"></script>
+<script src="../lib/d3.parcoords.js"></script>
 <script src="../nv.d3.js"></script>
 <!--script src="../src/utils.js"></script>
 <script src="../src/tooltip.js"></script>
@@ -39,7 +39,7 @@ text {
 <script src="../src/models/multiBarChart.js"></script>
 <script src="stream_layers.js"></script-->
 <script>
-var types = ['scatterChart', 'stackedArea', 'multiBarHorizontalChart', 'multiBarChart'];
+var types = ['parallelCoordinates', 'scatterChart', 'stackedArea', 'multiBarHorizontalChart', 'multiBarChart'];
 types.forEach(function (key) {
   $('#vizType').append($('<option/>').val(key).text(key));
 });
@@ -198,13 +198,37 @@ function findLineByLeastSquares(values_x, values_y) {
   return { m: m, b: b };
 }
 
+function parallelCoordinates() {
+  $('#container').addClass('parcoords');
+  var data = csv;
+
+  var parcoords = d3.parcoords()("#container")
+    .alpha(0.4)
+    .mode("queue") // progressive rendering
+    .height(d3.max([document.body.clientHeight-100, 220]))
+    .margin({
+      top: 36,
+      left: 0,
+      right: 0,
+      bottom: 16
+    });
+
+  parcoords
+    .data(data)
+    .render()
+    .reorderable()
+    .brushable();
+}
+
 function scatterChart() {
   var rollup = function (d) {
-    return [{
-      'Total Gold Medals': d3.sum(d, function (g) { return +g['Gold Medals']; }),
-      'Total Silver Medals': d3.sum(d, function (g) { return +g['Silver Medals']; }),
-      'Total Medals': d3.sum(d, function (g) { return +g['Total Medals']; })
-    }];
+    var measures = ['Gold Medals', 'Silver Medals', 'Bronze Medals', 'Total Medals'];
+    var o = {};
+    measures.forEach(function (measure) {
+      o['Sum ' + measure] = d3.sum(d, function (g) { return +g[measure]; });
+      o['Mean ' + measure] = d3.mean(d, function (g) { return +g[measure]; });
+    });
+    return [o];
   };
   var data = transformData(['Country'], rollup);
 
@@ -215,23 +239,23 @@ function scatterChart() {
   var chart = nv.models.scatterChart()
               .width(width)
               .height(height)
-              .x(function(d) { return +d['Total Gold Medals'] || 0; })
-              .y(function(d) { return +d['Total Silver Medals'] || 0; })
-              .size(function (d) { return +d['Total Medals'] || 0; })
+              .x(function(d) { return +d['Sum Gold Medals'] || 0; })
+              .y(function(d) { return +d['Sum Silver Medals'] || 0; })
+              .size(function (d) { return +d['Sum Total Medals'] || 0; })
               .useVoronoi(false)
               .showDistX(true)
               .showDistY(true)
 
-    chart.xAxis.tickFormat(d3.format('.0f')).axisLabel('Total Gold Medals');
-    chart.yAxis.tickFormat(d3.format('.0f')).axisLabel('Total Silver Medals');
+    chart.xAxis.tickFormat(d3.format('.0f')).axisLabel('Sum Gold Medals');
+    chart.yAxis.tickFormat(d3.format('.0f')).axisLabel('Sum Silver Medals');
     chart.tooltipContent(function(key, x, y, o, fn) {
         return '<h2>' + key + '</h2>';
     });
 
     // line of best fit
     /*
-    var xs=data.map(function (x) { return x.values[0]['Total Gold Medals']; })
-    var ys=data.map(function (x) { return x.values[0]['Total Silver Medals']; })
+    var xs=data.map(function (x) { return x.values[0]['Sum Gold Medals']; })
+    var ys=data.map(function (x) { return x.values[0]['Sum Silver Medals']; })
     var mb = findLineByLeastSquares(xs, ys);
     data.forEach(function (d) {
       d.slope = 0;
@@ -256,8 +280,10 @@ function scatterChart() {
 
 function render(type) {
   $('#container svg').empty();
+  $('#container canvas').remove();
   var chart;
   nv.addGraph(function() {
+    $('#container').removeClass('parcoords');
     var chart = eval(type + '()');
     return chart;
   });
