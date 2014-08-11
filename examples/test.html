@@ -49,6 +49,19 @@ d3.csv('OlympicAthletes.csv', function (csv) {
   render($('#vizType').val());
 });
 
+var columnTypes = {
+  "Athlete":"string",
+  "Age":"number",
+  "Country":"string",
+  "Year":"number",
+  "Closing Ceremony Date":"string",
+  "Sport":"string",
+  "Gold Medals":"number",
+  "Silver Medals":"number",
+  "Bronze Medals":"number",
+  "Total Medals":"number"
+};
+
 function transformData(keys, rollup) {
   var dim2_keys = {};
   var data = d3.nest();
@@ -200,9 +213,11 @@ function findLineByLeastSquares(values_x, values_y) {
 
 function parallelCoordinates() {
   $('#container').addClass('parcoords');
-  var data = csv;
 
-  var parcoords = d3.parcoords()("#container")
+  var data = csv;
+  var dimensions = Object.keys(csv[0]).filter(function (x) { return !x.match(/Date/); });
+
+  parcoords = d3.parcoords()("#container")
     .alpha(0.4)
     .mode("queue") // progressive rendering
     .height(d3.max([document.body.clientHeight-100, 220]))
@@ -214,6 +229,8 @@ function parallelCoordinates() {
     });
 
   parcoords
+    .types(columnTypes)
+    .dimensions(dimensions)
     .data(data)
     .render()
     .reorderable()
