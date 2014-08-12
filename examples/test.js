@@ -193,7 +193,7 @@ function barChart(dimensions, measures) {
   d3.select('#container svg')
       .attr('width', width)
       .attr('height', height)
-      .datum([{ key: 'key', values: data }])
+      .datum([{ key: dimensions[0], values: data }])
       .call(chart);
   
   return chart;
@@ -220,7 +220,7 @@ function barChartHorizontal(dimensions, measures) {
   d3.select('#container svg')
       .attr('width', width)
       .attr('height', height)
-      .datum([{ key: 'key', values: data }])
+      .datum([{ key: dimensions[0], values: data }])
       .call(chart);
   
   return chart;
@@ -583,28 +583,41 @@ function lineChartHelper(dimensions, measures, isArea) {
   var data = transformData(csv, dimensions, csvMeasures);
   var measure = measures[0];
 
+  var x_key = dimensions[0];
+  var x_vals = [];
+  csv.forEach(function (d) {
+    if (d[x_key] !== undefined && x_vals.indexOf(d[x_key]) === -1) {
+      x_vals.push(d[x_key]);
+    }
+  });
+  x_vals = x_vals.sort();
+  var xScale = d3.scale.ordinal().domain(x_vals);
+
   var width = nv.utils.windowSize().width - 100,
       height = nv.utils.windowSize().height - 20;
 
   var chart = nv.models.lineChart()
     .options({
       margin: {left: 100, bottom: 100},
-      x: function(d) {
-        return d.key;
+      x: function(d, i) {
+        return i;
       },
       y: function (d) {
         return d.values[0][measure];
       },
       showXAxis: true,
       showYAxis: true,
-      useVoronoi: false,
+      useVoronoi: true,
       transitionDuration: 250
     });
 
   // chart sub-models (ie. xAxis, yAxis, etc) when accessed directly, return themselves, not the parent chart, so need to chain separately
   chart.xAxis
     .axisLabel(dimensions[0])
-    .tickFormat(d3.format(',.2f'));
+    .scale(xScale)
+    .tickFormat(function (d, i) {
+      return x_vals[d];
+    });
 
   chart.yAxis
     .axisLabel(measure)
@@ -613,7 +626,7 @@ function lineChartHelper(dimensions, measures, isArea) {
   d3.select('#container svg')
     .attr('width', width)
     .attr('height', height)
-    .datum([{ key: 'key', values: data, area: isArea }])
+    .datum([{ key: x_key, values: data, area: isArea }])
     .call(chart);
 
   return chart;
