@@ -9,6 +9,7 @@ var vizTypes = {
   bubbleChart: { ndimensions: 2, nmeasures: 1 },
   lineChart: { ndimensions: 1, nmeasures: 1 },
   areaChart: { ndimensions: 1, nmeasures: 1 },
+  barChart: { ndimensions: 1, nmeasures: 1 },
   barChartHorizontal: { ndimensions: 1, nmeasures: 1 },
   pieChart: { ndimensions: 1, nmeasures: 1 }
 };
@@ -569,42 +570,56 @@ function bubbleChart(dimensions, measures) {
 	}
 }
 
+function areaChart(dimensions, measures) {
+  return lineChartHelper(dimensions, measures, true);
+}
+
 function lineChart(dimensions, measures) {
+  return lineChartHelper(dimensions, measures, false);
+}
+
+function lineChartHelper(dimensions, measures, isArea) {
+  dimensions = dimensions.slice(0, 1);
+  var data = transformData(csv, dimensions, csvMeasures);
+  var measure = measures[0];
+
+  var width = nv.utils.windowSize().width - 100,
+      height = nv.utils.windowSize().height - 20;
+
   var chart = nv.models.lineChart()
-  .options({
-    margin: {left: 100, bottom: 100},
-    x: function(d,i) { return i},
-    showXAxis: true,
-    showYAxis: true,
-    transitionDuration: 250
-  })
-  ;
+    .options({
+      margin: {left: 100, bottom: 100},
+      x: function(d) {
+        return d.key;
+      },
+      y: function (d) {
+        return d.values[0][measure];
+      },
+      showXAxis: true,
+      showYAxis: true,
+      useVoronoi: false,
+      transitionDuration: 250
+    });
 
   // chart sub-models (ie. xAxis, yAxis, etc) when accessed directly, return themselves, not the parent chart, so need to chain separately
   chart.xAxis
-    .axisLabel("Time (s)")
-    .tickFormat(d3.format(',.1f'));
+    .axisLabel(dimensions[0])
+    .tickFormat(d3.format(',.2f'));
 
   chart.yAxis
-    .axisLabel('Voltage (v)')
-    .tickFormat(d3.format(',.2f'))
-    ;
+    .axisLabel(measure)
+    .tickFormat(d3.format(',.2f'));
 
-  d3.select('#chart1 svg')
-    .datum(sinAndCos())
+  d3.select('#container svg')
+    .attr('width', width)
+    .attr('height', height)
+    .datum([{ key: 'key', values: data, area: isArea }])
     .call(chart);
-
-  //TODO: Figure out a good way to do this automatically
-  nv.utils.windowResize(chart.update);
-  //nv.utils.windowResize(function() { d3.select('#chart1 svg').call(chart) });
-
-  chart.dispatch.on('stateChange', function(e) { nv.log('New State:', JSON.stringify(e)); });
 
   return chart;
 }
 
 function radarChart(dimensions, measures) {
-  dimensions = dimensions;
   var measure = measures[0];
   var data = transformData(csv, dimensions, csvMeasures);
 
