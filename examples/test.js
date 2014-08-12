@@ -2,7 +2,7 @@ var vizTypes = {
   multiBarChart: { ndimensions: 2, nmeasures: 1 },
   radarChart: { ndimensions: 2, nmeasures: 1 },
   parallelSets: { ndimensions: 2, nmeasures: 0 },
-  parallelCoordinates: { ndimensions: 2, nmeasures: 0 },
+  parallelCoordinates: { ndimensions: 0, nmeasures: 2 },
   scatterChart: { ndimensions: 1, nmeasures: 2 },
   stackedArea: { ndimensions: 2, nmeasures: 1 },
   multiBarChartHorizontal: { ndimensions: 2, nmeasures: 1 },
@@ -154,6 +154,7 @@ function transformData(csv, dimensions, measures) {
 }
 
 function pieChart(dimensions, measures) {
+  dimensions = dimensions.slice(0, 1);
   var measure = measures[0];
   var data = transformData(csv, dimensions, csvMeasures);
 
