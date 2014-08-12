@@ -64,7 +64,7 @@ var vizTypes = {
   scatterChart: { ndimensions: 1, nmeasures: 2 },
   stackedArea: { ndimensions: 2, nmeasures: 1 },
   multiBarChartHorizontal: { ndimensions: 2, nmeasures: 1 },
-  timeBubbles: { ndimensions: 2, nmeasures: 1 },
+  bubbleChart: { ndimensions: 2, nmeasures: 1 },
   barChart: { ndimensions: 1, nmeasures: 1 },
   barChartHorizontal: { ndimensions: 1, nmeasures: 1 },
   pieChart: { ndimensions: 1, nmeasures: 1 }
@@ -511,18 +511,26 @@ function parallelSets(dimensions, _) {
   vis.datum(data).call(chart);
 }
 
-function timeBubbles(dimensions, measures) {
+function bubbleChart(dimensions, measures) {
   dimensions = dimensions.slice(0, 2);
   var measure = measures[0];
+  var x_key = dimensions[1];
+  var x_vals = [];
+  csv.forEach(function (d) {
+    if (d[x_key] !== undefined && x_vals.indexOf(d[x_key]) === -1) {
+      x_vals.push(d[x_key]);
+    }
+  });
+  x_vals = x_vals.sort();
+
   var data = transformData(csv, dimensions, csvMeasures);
 
   var margin = {top: 20, right: 200, bottom: 0, left: 20},
     width = nv.utils.windowSize().width - 300,
     height = nv.utils.windowSize().height * 3;
 
-  var yearExtent = d3.extent(csv, function (d) { return +d['Year']; });
-  var start_year = yearExtent[0];
-  var end_year = yearExtent[1];
+  var start_x = 0;
+  var end_x = x_vals.length - 1;
 
   var c = d3.scale.category20c();
 
@@ -533,8 +541,9 @@ function timeBubbles(dimensions, measures) {
     .scale(x)
     .orient("top");
 
-  var formatYears = d3.format("0000");
-  xAxis.tickFormat(formatYears);
+  xAxis.tickFormat(function (d, i) {
+    return x_vals[d];
+  });
 
   var svg = d3.select("#container svg")
     .attr("width", width + margin.left + margin.right)
@@ -543,9 +552,9 @@ function timeBubbles(dimensions, measures) {
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	x.domain([start_year, end_year]);
+	x.domain([start_x, end_x]);
 	var xScale = d3.scale.linear()
-		.domain([start_year, end_year])
+		.domain([start_x, end_x])
 		.range([0, width]);
 
 	svg.append("g")
@@ -574,7 +583,7 @@ function timeBubbles(dimensions, measures) {
 
 		circles
       .attr("cx", function(d, i) {
-        return xScale(+d['key']);
+        return xScale(x_vals.indexOf(d.key));
       })
 			.attr("cy", j*20+20)
       .attr("r", function(d) {
@@ -585,7 +594,7 @@ function timeBubbles(dimensions, measures) {
 		text
 			.attr("y", j*20+25)
       .attr("x",function(d, i) {
-        return xScale(+d['key'])-5;
+        return xScale(x_vals.indexOf(d.key))-5;
       })
 			.attr("class","value")
       .text(function(d){
@@ -598,7 +607,7 @@ function timeBubbles(dimensions, measures) {
 			.attr("y", j*20+25)
 			.attr("x",width+20)
 			.attr("class","label")
-			.text(truncate(data[j]['key'],30,"..."))
+			.text(truncate(data[j].key,30,"..."))
 			.style("fill", function(d) { return c(j); })
 			.on("mouseover", mouseover)
 			.on("mouseout", mouseout);
