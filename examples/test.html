@@ -265,14 +265,18 @@ function barChartHorizontal(dimensions, measures) {
   var chart = nv.models.multiBarHorizontalChart()
       .width(width)
       .height(height)
+      .margin({top: 30, right: 20, bottom: 50, left: 175})
       .showBarLabels(true)
+      .showControls(false)
+      .showLegend(false)
+      .stacked(true)
       .x(function(d) { return d.key; })
-      .y(function(d) { return d.values instanceof Array ? d.values[0][measure] : d[measure] });
+      .y(function(d) { return d.values instanceof Array ? d.values[0][measure] : d[measure]; });
 
   d3.select('#container svg')
       .attr('width', width)
       .attr('height', height)
-      .datum(data)
+      .datum([{ key: 'key', values: data }])
       .call(chart);
   
   return chart;
