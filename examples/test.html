@@ -3,15 +3,21 @@
 <link href="../src/nv.d3.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
 <link rel="stylesheet" type="text/css" href="../d3.parsets.css">
+<link rel="stylesheet" type="text/css" href="../radar-chart.min.css">
+<link rel="stylesheet" type="text/css" href="../bootstrap.css">
+<link rel="stylesheet" type="text/css" href="../select2.css">
 <style>
 body,html {
-  overflow-y:scroll;
   width: 100%;
   height: 100%;
 }
 
 text {
   font: 12px sans-serif;
+}
+
+.select2-container {
+  width: 450px;
 }
 
 #container {
@@ -22,14 +28,23 @@ text {
 
 </style>
 <body>
-  <select id="vizType"></select>
+  <div>
+  Dimensions<div id="dimensionsSelect" class="select2-container select2-container-multi"><input type="hidden" id="dimensionsSelect_val"></input></div>
+  Measures<div id="measuresSelect" class="select2-container select2-container-multi"><input type="hidden" id="measuresSelect_val"></input></div>
+  Widget<select id="vizType"></select>
+  <input id="renderBtn" type="button" value="Render"></input>
+  </div>
   <div id="container" class='with-3d-shadow with-transitions'>
     <svg></svg>
   </div>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="../lib/jquery.min.js"></script>
 <script src="../lib/d3.v3.js"></script>
 <script src="../lib/d3.parcoords.js"></script>
 <script src="../lib/d3.parsets.js"></script>
+<script src="../lib/radar-chart.min.js"></script>
+<script src="../lib/chrono.min.js"></script>
+<script src="../lib/jquery-ui.min.js"></script>
+<script src="../lib/select2.min.js"></script>
 <script src="../nv.d3.js"></script>
 <!--script src="../src/utils.js"></script>
 <script src="../src/tooltip.js"></script>
@@ -41,33 +56,121 @@ text {
 <script src="../src/models/multiBarChart.js"></script>
 <script src="stream_layers.js"></script-->
 <script>
-var types = ['parallelSets', 'timeBubbles', 'parallelCoordinates', 'scatterChart', 'stackedArea', 'multiBarHorizontalChart', 'multiBarChart'];
+var vizTypes = {
+  multiBarChart: { ndimensions: 2, nmeasures: 1 },
+  radarChart: { ndimensions: 2, nmeasures: 1 },
+  parallelSets: { ndimensions: 2, nmeasures: 0 },
+  parallelCoordinates: { ndimensions: 2, nmeasures: 0 },
+  scatterChart: { ndimensions: 1, nmeasures: 2 },
+  stackedArea: { ndimensions: 2, nmeasures: 1 },
+  multiBarChartHorizontal: { ndimensions: 2, nmeasures: 1 },
+  timeBubbles: { ndimensions: 2, nmeasures: 1 },
+  barChart: { ndimensions: 1, nmeasures: 1 },
+  barChartHorizontal: { ndimensions: 1, nmeasures: 1 },
+  pieChart: { ndimensions: 1, nmeasures: 1 }
+};
+
+var types = Object.keys(vizTypes).sort();
 types.forEach(function (key) {
   $('#vizType').append($('<option/>').val(key).text(key));
 });
 
+function populateSelect2(id, vals) {
+  $(id).select2({ tags: vals });
+  $(id).on('change', function () {
+    $(id + '_val').html($(id).val());
+  });
+  $(id).select2('container').find('ul.select2-choices').sortable({
+    containment: 'parent',
+    start: function() { $(id).select2('onSortStart'); },
+    update: function() { $(id).select2('onSortEnd'); }
+  });
+
+}
+
 d3.csv('OlympicAthletes.csv', function (csv) {
   window.csv = csv;
-  render($('#vizType').val());
+  window.columnTypes = getColumnTypes(csv);
+  window.csvDimensions = getDimensions(csv);
+  window.csvMeasures = getMeasures(csv);
+  window.csvDateDimensions = getDateDimensions(csv);
+  csv.forEach(function (d, i) {
+    csvDateDimensions.forEach(function (key) {
+      d[key] = chrono.parseDate(d[key]);
+    });
+  });
+  populateSelect2('#dimensionsSelect', csvDimensions);
+  populateSelect2('#measuresSelect', csvMeasures.concat(csvMeasures.map(function (x) { return 'Sum ' + x; }).concat(csvMeasures.map(function (x) { return 'Mean ' + x; }))));
+
+//  $('#dimensionsSelect').select2('val', csvDimensions.slice(0, 2));
+//  $('#measuresSelect').select2('val', csvMeasures.slice(0, 1));
 });
 
-var columnTypes = {
-  "Athlete":"string",
-  "Age":"number",
-  "Country":"string",
-  "Year":"number",
-  "Closing Ceremony Date":"string",
-  "Sport":"string",
-  "Gold Medals":"number",
-  "Silver Medals":"number",
-  "Bronze Medals":"number",
-  "Total Medals":"number"
-};
+function getColumnTypes(csv) {
+  function getColumnType(key) {
+    if (chrono.parseDate(csv[1][key])) {
+      return "date";
+    } else if (!isNaN(parseFloat(csv[1][key]))) {
+      return "number";
+    }
+    return "string";
+  }
 
-function transformData(keys, rollup) {
+  var o = {};
+  Object.keys(csv[0]).forEach(function (key) {
+    o[key] = getColumnType(key);
+  });
+
+  return o;
+}
+
+function getDateDimensions(csv) {
+  var L = [];
+  for (var key in columnTypes) {
+    if (['date'].indexOf(columnTypes[key]) > -1) {
+      L.push(key);
+    }
+  }
+  return L;
+}
+
+function getDimensions(csv) {
+  var L = [];
+  for (var key in columnTypes) {
+    if (['string', 'date'].indexOf(columnTypes[key]) > -1) {
+      L.push(key);
+    }
+  }
+  return L;
+}
+
+function getMeasures(csv) {
+  var L = [];
+  for (var key in columnTypes) {
+    if (columnTypes[key] === "number") {
+      L.push(key);
+    }
+  }
+  return L;
+}
+
+function transformData(csv, dimensions, measures) {
+  var empty = {};
+  measures.forEach(function (measure) {
+    empty['Sum ' + measure] = 0;
+    empty['Mean ' + measure] = 0;
+  });
+  var rollup = function (d) {
+    var o = {};
+    measures.forEach(function (measure) {
+      o['Sum ' + measure] = d3.sum(d, function (g) { return +g[measure]; });
+      o['Mean ' + measure] = d3.mean(d, function (g) { return +g[measure]; });
+    });
+    return [o];
+  };
   var dim2_keys = {};
   var data = d3.nest();
-  keys.forEach(function (key) {
+  dimensions.forEach(function (key) {
     data = data.key(function (d) { return d[key]; }).sortKeys(d3.ascending);
   });
   if (rollup) {
@@ -88,7 +191,7 @@ function transformData(keys, rollup) {
       var values = keys2.map(function (key) {
         return {
           key: key,
-          values: 0
+          values: [empty]
         };
       });
       if (dim1.values instanceof Array) {
@@ -106,19 +209,99 @@ function transformData(keys, rollup) {
   return data;
 }
 
-function multiBarChart() {
-  var chart = nv.models.multiBarChart()
+function pieChart(dimensions, measures) {
+  var measure = measures[0];
+  var data = transformData(csv, dimensions, csvMeasures);
+
+  var width = nv.utils.windowSize().width - 100,
+      height = nv.utils.windowSize().height - 20;
+
+  var chart = nv.models.pieChart()
+      .width(width)
+      .height(height)
       .x(function(d) { return d.key })
-      .y(function(d) { return d.values })
+      .y(function(d) { return d.values[0][measure] });
+
+  d3.select('#container svg')
+      .attr('width', width)
+      .attr('height', height)
+      .datum(data)
+      .call(chart);
+  
+  return chart;
+}
+
+function barChart(dimensions, measures) {
+  var measure = measures[0];
+  var data = transformData(csv, dimensions, csvMeasures);
+
+  var width = nv.utils.windowSize().width - 100,
+      height = nv.utils.windowSize().height - 20;
+
+  var chart = nv.models.discreteBarChart()
+      .width(width)
+      .height(height)
+      .staggerLabels(true)
+      .showValues(true)
+      .x(function(d) { return d.key })
+      .y(function(d) { return d.values instanceof Array ? d.values[0][measure] : d[measure] });
+
+  d3.select('#container svg')
+      .attr('width', width)
+      .attr('height', height)
+      .datum([{ key: 'key', values: data }])
+      .call(chart);
+  
+  return chart;
+}
+
+function barChartHorizontal(dimensions, measures) {
+  var measure = measures[0];
+  var data = transformData(csv, dimensions, csvMeasures);
+
+  var width = nv.utils.windowSize().width - 100,
+      height = nv.utils.windowSize().height - 20;
+
+  var chart = nv.models.multiBarHorizontalChart()
+      .width(width)
+      .height(height)
+      .showBarLabels(true)
+      .x(function(d) { return d.key; })
+      .y(function(d) { return d.values instanceof Array ? d.values[0][measure] : d[measure] });
+
+  d3.select('#container svg')
+      .attr('width', width)
+      .attr('height', height)
+      .datum(data)
+      .call(chart);
+  
+  return chart;
+}
+
+function multiBarChart(dimensions, measures) {
+  dimensions = dimensions.slice(0, 2);
+  var measure = measures[0];
+  var data = transformData(csv, dimensions, csvMeasures);
+
+  var width = nv.utils.windowSize().width - 100,
+      height = nv.utils.windowSize().height - 20;
+
+  var chart = nv.models.multiBarChart()
+      .width(width)
+      .height(height)
+      .x(function(d) { return d.key })
+      .y(function(d) { return d.values[0][measure] })
       .margin({top: 30, right: 20, bottom: 50, left: 175})
 //        .showValues(false)
       .tooltips(true)
       .transitionDuration(250)
       .stacked(true)
+      .showLegend(false)
       .showControls(true);
 
-  var data = transformData(['Country', 'Sport'], function (d) { return d3.sum(d, function (g) { return g['Gold Medals']; }); });
   d3.select('#container svg')
+      .attr('width', width)
+      .attr('height', height)
       .datum(data)
       .call(chart);
 
@@ -127,10 +310,17 @@ function multiBarChart() {
   return chart;
 }
 
-function multiBarHorizontalChart() {
+function multiBarChartHorizontal(dimensions, measures) {
+  dimensions = dimensions.slice(0, 2);
+  var measure = measures[0];
+  var data = transformData(csv, dimensions, csvMeasures);
+
+  var width = nv.utils.windowSize().width - 100,
+      height = nv.utils.windowSize().height - 20;
+
   var chart = nv.models.multiBarHorizontalChart()
       .x(function(d) { return d.key })
-      .y(function(d) { return d.values })
+      .y(function(d) { return d.values[0][measure] })
       .margin({top: 30, right: 20, bottom: 50, left: 175})
 //        .showValues(false)
       .tooltips(true)
@@ -138,8 +328,9 @@ function multiBarHorizontalChart() {
       .stacked(true)
       .showControls(true);
 
-  var data = transformData(['Country', 'Sport'], function (d) { return d3.sum(d, function (g) { return g['Gold Medals']; }); });
   d3.select('#container svg')
+      .attr('width', width)
+      .attr('height', height)
       .datum(data)
       .call(chart);
 
@@ -148,8 +339,10 @@ function multiBarHorizontalChart() {
   return chart;
 }
 
-function stackedArea() {
-  var data = transformData(['Country', 'Sport'], function (d) { return d3.sum(d, function (g) { return g['Gold Medals']; }); });
+function stackedArea(dimensions, measures) {
+  dimensions = dimensions.slice(0, 2);
+  var measure = measures[0];
+  var data = transformData(csv, dimensions, csvMeasures);
 
   var sports = [];
   data[0].values.forEach(function (o) {
@@ -163,7 +356,7 @@ function stackedArea() {
               .width(width)
               .height(height)
               .x(function(d) { return sports.indexOf(d.key); })
-              .y(function(d) { return d.values })
+              .y(function(d) { return d.values[0][measure] })
 //              .offset('wiggle')
 //              .order('default')
 
@@ -213,11 +406,9 @@ function findLineByLeastSquares(values_x, values_y) {
   return { m: m, b: b };
 }
 
-function parallelCoordinates() {
+function parallelCoordinates(dimensions, measures) {
+  dimensions = dimensions && measures ? dimensions.concat(measures) : csvDimensions.concat(csvMeasures);
   $('#container').addClass('parcoords');
-
-  var data = csv;
-  var dimensions = Object.keys(csv[0]).filter(function (x) { return !x.match(/Date/); });
 
   parcoords = d3.parcoords()("#container")
     .alpha(0.4)
@@ -233,23 +424,16 @@ function parallelCoordinates() {
   parcoords
     .types(columnTypes)
     .dimensions(dimensions)
-    .data(data)
+    .data(csv)
     .render()
     .reorderable()
     .brushable();
 }
 
-function scatterChart() {
-  var rollup = function (d) {
-    var measures = ['Gold Medals', 'Silver Medals', 'Bronze Medals', 'Total Medals'];
-    var o = {};
-    measures.forEach(function (measure) {
-      o['Sum ' + measure] = d3.sum(d, function (g) { return +g[measure]; });
-      o['Mean ' + measure] = d3.mean(d, function (g) { return +g[measure]; });
-    });
-    return [o];
-  };
-  var data = transformData(['Country'], rollup);
+function scatterChart(dimensions, measures) {
+  dimensions = dimensions.slice(0, 1);
+  measures = measures.slice(0, 3);
+  var data = transformData(csv, dimensions, csvMeasures);
 
   var width = nv.utils.windowSize().width - 100,
       height = nv.utils.windowSize().height - 20;
@@ -258,23 +442,23 @@ function scatterChart() {
   var chart = nv.models.scatterChart()
               .width(width)
               .height(height)
-              .x(function(d) { return +d['Sum Gold Medals'] || 0; })
-              .y(function(d) { return +d['Sum Silver Medals'] || 0; })
-              .size(function (d) { return +d['Sum Total Medals'] || 0; })
+              .x(function(d) { return +d[measures[0]] || 0; })
+              .y(function(d) { return +d[measures[1]] || 0; })
+              .size(function (d) { return +d[measures[2]] || 0; })
               .useVoronoi(false)
               .showDistX(true)
               .showDistY(true)
 
-    chart.xAxis.tickFormat(d3.format('.0f')).axisLabel('Sum Gold Medals');
-    chart.yAxis.tickFormat(d3.format('.0f')).axisLabel('Sum Silver Medals');
+    chart.xAxis.tickFormat(d3.format('.0f')).axisLabel(measures[0]);
+    chart.yAxis.tickFormat(d3.format('.0f')).axisLabel(measures[1]);
     chart.tooltipContent(function(key, x, y, o, fn) {
         return '<h2>' + key + '</h2>';
     });
 
     // line of best fit
     /*
-    var xs=data.map(function (x) { return x.values[0]['Sum Gold Medals']; })
-    var ys=data.map(function (x) { return x.values[0]['Sum Silver Medals']; })
+    var xs=data.map(function (x) { return x.values[0][measures[0]]; })
+    var ys=data.map(function (x) { return x.values[0][measures[1]]; })
     var mb = findLineByLeastSquares(xs, ys);
     data.forEach(function (d) {
       d.slope = 0;
@@ -306,22 +490,13 @@ function truncate(str, maxLength, suffix) {
 	return str;
 }
 
-function parallelSets() {
-  var rollup = function (d) {
-    var measures = ['Gold Medals', 'Silver Medals', 'Bronze Medals', 'Total Medals'];
-    var o = {};
-    measures.forEach(function (measure) {
-      o['Sum ' + measure] = d3.sum(d, function (g) { return +g[measure]; });
-      o['Mean ' + measure] = d3.mean(d, function (g) { return +g[measure]; });
-    });
-    return [o];
-  };
-  var data = csv;//transformData(['Country'], rollup);
+function parallelSets(dimensions, _) {
+  var data = csv;
 
   var width = nv.utils.windowSize().width;
   var height = nv.utils.windowSize().height - 100;
   var chart = d3.parsets()
-  .dimensions(['Year', 'Country'])
+  .dimensions(dimensions)
   .height(height)
   .width(width);
 
@@ -332,18 +507,10 @@ function parallelSets() {
   vis.datum(data).call(chart);
 }
 
-function timeBubbles() {
-  var rollup = function (d) {
-    var measures = ['Gold Medals', 'Silver Medals', 'Bronze Medals', 'Total Medals'];
-    var o = {};
-    measures.forEach(function (measure) {
-      o['Sum ' + measure] = d3.sum(d, function (g) { return +g[measure]; });
-      o['Mean ' + measure] = d3.mean(d, function (g) { return +g[measure]; });
-    });
-    return [o];
-  };
-  var data = transformData(['Country', 'Year'], rollup);
-  var measure = 'Sum Gold Medals';
+function timeBubbles(dimensions, measures) {
+  dimensions = dimensions.slice(0, 2);
+  var measure = measures[0];
+  var data = transformData(csv, dimensions, csvMeasures);
 
   var margin = {top: 20, right: 200, bottom: 0, left: 20},
     width = nv.utils.windowSize().width - 300,
@@ -446,21 +613,68 @@ function timeBubbles() {
 	}
 }
 
-function render(type) {
+function radarChart(dimensions, measures) {
+  dimensions = dimensions;
+  var measure = measures[0];
+  var data = transformData(csv, dimensions, csvMeasures);
+
+  data = data.map(function (x) {
+    return {
+      className: x.key,
+      axes: x.values.map(function (y) {
+        return { axis: y.key, value: y.values[0][measure] };
+      }) //.filter(function (z) { return z.value > 0; })
+    };
+  });
+
+  var width = nv.utils.windowSize().width - 100,
+      height = nv.utils.windowSize().height - 100;
+  RadarChart.defaultConfig.w = width;
+  RadarChart.defaultConfig.h = height;
+  var chart = RadarChart.chart();
+  var svg = d3.select('#container svg')
+    .attr('width', width)
+    .attr('height', height);
+
+  svg.append('g').classed('focus', 1).datum(data).call(chart);
+}
+
+function render() {
+  var dimensions = $('#dimensionsSelect').select2('val');
+  var measures = $('#measuresSelect').select2('val');
+  var vizType = $('#vizType').val();
+
+  if (!validParameters(vizType, dimensions, measures)) {
+    return;
+  }
+
   $('#container svg').empty();
   $('#container canvas').remove();
+
   var chart;
   nv.addGraph(function() {
     $('#container').removeClass('parcoords');
-    var chart = eval(type + '()');
+    var fn = eval(vizType);
+    var chart = fn(dimensions, measures);
     return chart;
   });
 }
 
+function validParameters(vizType, dimensions, measures) {
+  var settings = vizTypes[vizType];
+  if (!settings) {
+    alert('Unknown type: ' + vizType);
+    return false;
+  } else if (dimensions.length < settings.ndimensions || measures.length < settings.nmeasures) {
+    alert(vizType + ' needs >= ' + settings.ndimensions + ' dimension(s), >= ' + settings.nmeasures + ' measure(s)');
+    return false;
+  }
+  return true;
+}
+
 $(document).ready(function () {
-  $('#vizType').change(function () {
-    var type = $(this).val();
-    render(type);
+  $('#renderBtn').click(function () {
+    render();
   });
 });
 
