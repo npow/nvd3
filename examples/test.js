@@ -586,11 +586,11 @@ function lineChart(dimensions, measures) {
 }
 
 function lineChartHelper(dimensions, measures, isArea) {
-  dimensions = dimensions.slice(0, 1);
+  dimensions = dimensions.slice(0, 2);
   var data = transformData(csv, dimensions, csvMeasures);
   var measure = measures[0];
 
-  var x_key = dimensions[0];
+  var x_key = dimensions[dimensions.length-1];
   var x_vals = [];
   csv.forEach(function (d) {
     if (d[x_key] !== undefined && x_vals.indexOf(d[x_key]) === -1) {
@@ -620,7 +620,7 @@ function lineChartHelper(dimensions, measures, isArea) {
 
   // chart sub-models (ie. xAxis, yAxis, etc) when accessed directly, return themselves, not the parent chart, so need to chain separately
   chart.xAxis
-    .axisLabel(dimensions[0])
+    .axisLabel(x_key)
     .scale(xScale)
     .tickFormat(function (d, i) {
       return x_vals[d];
@@ -633,7 +633,7 @@ function lineChartHelper(dimensions, measures, isArea) {
   d3.select('#container svg')
     .attr('width', width)
     .attr('height', height)
-    .datum([{ key: x_key, values: data, area: isArea }])
+    .datum(dimensions.length === 1 ? [{ key: x_key, values: data, area: isArea }] : data)
     .call(chart);
 
   return chart;
