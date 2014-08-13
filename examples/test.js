@@ -32,7 +32,7 @@ function populateSelect2(id, vals) {
 
 }
 
-d3.csv('OlympicAthletes.csv', function (csv) {
+function processData(csv) {
   window.csv = csv;
   window.columnTypes = getColumnTypes(csv);
   window.csvDimensions = getDimensions(csv);
@@ -46,13 +46,19 @@ d3.csv('OlympicAthletes.csv', function (csv) {
   populateSelect2('#dimensionsSelect', csvDimensions);
   populateSelect2('#measuresSelect', csvMeasures.concat(csvMeasures.map(function (x) { return 'Sum ' + x; }).concat(csvMeasures.map(function (x) { return 'Mean ' + x; }))));
 
-//  $('#dimensionsSelect').select2('val', csvDimensions.slice(0, 2));
-//  $('#measuresSelect').select2('val', csvMeasures.slice(0, 1));
+  $('#dimensionsSelect').select2('val', []);
+  $('#measuresSelect').select2('val', []);
+}
+
+d3.csv('OlympicAthletes.csv', function (csv) {
+  processData(csv);
 });
 
-function getColumnTypes(csv) {
+function getColumnTypes(csv) { // TODO: check random subset of rows
   function getColumnType(key) {
-    if (chrono.parseDate(csv[1][key])) {
+    if (csv[1][key] === undefined) {
+      return "string"; // TODO
+    } else if (chrono.parseDate(csv[1][key])) {
       return "date";
     } else if (!isNaN(parseFloat(csv[1][key]))) {
       return "number";
@@ -695,5 +701,22 @@ $(document).ready(function () {
   $('#renderBtn').click(function () {
     render();
   });
+
+  // CSV Uploader
+  var uploader = document.getElementById("uploader");  
+  var reader = new FileReader();
+
+  reader.onload = function(e) {
+    var contents = e.target.result;
+    var csv = d3.csv.parse(contents);
+    processData(csv);
+  };
+
+  uploader.addEventListener("change", handleFiles, false);
+
+  function handleFiles() {
+    var file = this.files[0];
+    reader.readAsText(file);
+  }
 });
 
