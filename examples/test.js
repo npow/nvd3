@@ -1,4 +1,5 @@
 var g_filters = {};
+var g_timeouts = {};
 
 var vizTypes = {
   multiBarChart: { ndimensions: 2, nmeasures: 1 },
@@ -54,13 +55,30 @@ function populateMultiselect(id, vals) {
   });
 }
 
+function flattenTree(root) {
+  var children = [];
+
+  function recurse(node) {
+    if (node.values instanceof Array) {
+      node.values.forEach(function (child) {
+        recurse(child);
+      });
+    } else {
+      children.push(node);
+    }
+  }
+
+  recurse(root);
+  return children;
+}
+
 function createFilters(dimensions, measures) {
   $('#filterContainer').empty();
   g_filters = {};
-  dimensions.forEach(function (dimension) {
-    var id = dimension + '_select';
-    var vals = getColumn(dimension);
-    $('#filterContainer').append(dimension + '<select id="' + id + '" class="multiselect" multiple="multiple"></div>');
+  dimensions.forEach(function (key) {
+    var id = key.replace(/ /g, '_') + '_select';
+    var vals = getColumn(key);
+    $('#filterContainer').append('<div class="filter-label">' + key + '</div><select id="' + id + '" class="multiselect" multiple="multiple"></div>');
     populateMultiselect('#' + id, vals);
     $('#' + id).multiselect({
       includeSelectAllOption: true,
@@ -69,15 +87,39 @@ function createFilters(dimensions, measures) {
       maxHeight: 400,
       onChange: function (option, checked) {
         var selectedVals = [].map.call($('#' + id + ' option:selected'), function (x) { return $(x).val(); })
-        g_filters[dimension] = function (d) {
-          return selectedVals.indexOf(d[dimension]) > -1;
+        g_filters[key] = function (d) {
+          return selectedVals.indexOf(d[key]) > -1;
         }
         render(false);
       }
     });
   });
-  measures.forEach(function (measure) {
-
+  measures.forEach(function (key) {
+    var id = key.replace(/ /g, '_') + '_select';
+    var measure = key.replace(/^(Count |Sum |Mean )/, '');
+    var vals = getColumn(measure);
+    var extent = d3.extent(vals, function (x) { return parseFloat(x); });
+    $('#filterContainer').append('<div class="filter-label">' + measure + '</div><div id="' + id + '"></div>');
+    $('#' + id).slider({
+      range: true,
+      values: extent,
+      min: extent[0],
+      max: extent[1],
+      slide: function (event, ui) {
+        var values = ui.values;
+        g_filters[measure] = function (d) {
+          return d[measure] >= values[0] && d[measure] <= values[1];
+        };
+        $(ui.handle).text(ui.value);
+        if (g_timeouts[measure]) {
+          clearTimeout(g_timeouts[measure]);
+        }
+        g_timeouts[measure] = setTimeout(render, 200); // throttle by 200ms
+      }
+    });
+    var handles = $('#' + id).find('.ui-slider-handle');
+    $(handles[0]).text(extent[0]);
+    $(handles[1]).text(extent[1]);
   });
 }
 
@@ -177,9 +219,9 @@ function getMeasures(csv) {
 function transformData(csv, dimensions, measures) {
   var empty = {};
   measures.forEach(function (measure) {
-    empty['Sum ' + measure] = 0;
-    empty['Mean ' + measure] = 0;
-    empty['Count ' + measure] = 0;
+    empty['Sum ' + measure] = null;
+    empty['Mean ' + measure] = null;
+    empty['Count ' + measure] = null;
   });
   var rollup = function (d) {
     var o = {};
@@ -237,7 +279,7 @@ function pieChart(csv, dimensions, measures) {
   var data = transformData(csv, dimensions, csvMeasures);
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 50;
+      height = nv.utils.windowSize().height - 70;
 
   var chart = nv.models.pieChart()
       .width(width)
@@ -261,7 +303,7 @@ function barChart(csv, dimensions, measures) {
   var data = transformData(csv, dimensions, csvMeasures);
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 50;
+      height = nv.utils.windowSize().height - 70;
 
   var chart = nv.models.discreteBarChart()
       .width(width)
@@ -286,7 +328,7 @@ function barChartHorizontal(csv, dimensions, measures) {
   var data = transformData(csv, dimensions, csvMeasures);
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 50;
+      height = nv.utils.windowSize().height - 70;
 
   var chart = nv.models.multiBarHorizontalChart()
       .width(width)
@@ -314,7 +356,7 @@ function multiBarChart(csv, dimensions, measures) {
   var data = transformData(csv, dimensions, csvMeasures);
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 50;
+      height = nv.utils.windowSize().height - 70;
 
   var chart = nv.models.multiBarChart()
       .width(width)
@@ -344,7 +386,7 @@ function multiBarChartHorizontal(csv, dimensions, measures) {
   var data = transformData(csv, dimensions, csvMeasures);
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 50;
+      height = nv.utils.windowSize().height - 70;
 
   var chart = nv.models.multiBarHorizontalChart()
       .x(function(d) { return d.key })
@@ -377,7 +419,7 @@ function stackedArea(csv, dimensions, measures) {
   });
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 50;
+      height = nv.utils.windowSize().height - 70;
 
   var chart = nv.models.stackedAreaChart()
               .width(width)
@@ -464,7 +506,7 @@ function scatterChart(csv, dimensions, measures) {
   var data = transformData(csv, dimensions, csvMeasures);
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 50;
+      height = nv.utils.windowSize().height - 70;
 
 //  var chart = nv.models.scatterPlusLineChart()
   var chart = nv.models.scatterChart()
@@ -675,7 +717,7 @@ function lineChartHelper(csv, dimensions, measures, isArea) {
   var xScale = d3.scale.ordinal().domain(x_vals);
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 50;
+      height = nv.utils.windowSize().height - 70;
 
   var chart = nv.models.lineChart()
     .options({

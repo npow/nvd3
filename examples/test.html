@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <link href="../src/nv.d3.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="../css/jquery-ui.min.css">
 <link rel="stylesheet" type="text/css" href="../css/d3.parcoords.css">
 <link rel="stylesheet" type="text/css" href="../css/d3.parsets.css">
 <link rel="stylesheet" type="text/css" href="../css/radar-chart.min.css">
@@ -32,6 +33,17 @@ text {
   min-height: 100px;
 }
 
+.ui-slider {
+  margin-left: 20px;
+  margin-right: 20px;
+  width: 150px;
+  display: inline-block;
+}
+
+.filter-label {
+  display: inline-block;
+}
+
 </style>
 <body>
   <details open>
@@ -60,6 +72,7 @@ text {
 <script src="../lib/select2.min.js"></script>
 <script src="../lib/bootstrap-3.1.1.min.js"></script>
 <script src="../lib/bootstrap-multiselect.js"></script>
+<script src="../lib/crossfilter.min.js"></script>
 <script src="../nv.d3.js"></script>
 <script src="test.js"></script>
 <!--script src="../src/utils.js"></script>
