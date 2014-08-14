@@ -50,7 +50,7 @@ function processData(csv) {
   $('#measuresSelect').select2('val', []);
 }
 
-d3.csv('OlympicAthletes.csv', function (csv) {
+d3.csv('OlympicAthletes_small.csv', function (csv) {
   processData(csv);
 });
 
@@ -170,6 +170,7 @@ function pieChart(dimensions, measures) {
   var chart = nv.models.pieChart()
       .width(width)
       .height(height)
+      .showLegend(false)
       .x(function(d) { return d.key })
       .y(function(d) { return d.values[0][measure] });
 
@@ -260,8 +261,6 @@ function multiBarChart(dimensions, measures) {
       .datum(data)
       .call(chart);
 
-  nv.utils.windowResize(chart.update);
-
   return chart;
 }
 
@@ -281,6 +280,7 @@ function multiBarChartHorizontal(dimensions, measures) {
       .tooltips(true)
       .transitionDuration(250)
       .stacked(true)
+      .showLegend(false)
       .showControls(true);
 
   d3.select('#container svg')
@@ -288,8 +288,6 @@ function multiBarChartHorizontal(dimensions, measures) {
       .attr('height', height)
       .datum(data)
       .call(chart);
-
-  nv.utils.windowResize(chart.update);
 
   return chart;
 }
@@ -305,11 +303,12 @@ function stackedArea(dimensions, measures) {
   });
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 20;
+      height = nv.utils.windowSize().height - 30;
 
   var chart = nv.models.stackedAreaChart()
               .width(width)
               .height(height)
+              .showLegend(false)
               .x(function(d) { return sports.indexOf(d.key); })
               .y(function(d) { return d.values[0][measure] })
 //              .offset('wiggle')
@@ -400,7 +399,8 @@ function scatterChart(dimensions, measures) {
               .x(function(d) { return +d[measures[0]] || 0; })
               .y(function(d) { return +d[measures[1]] || 0; })
               .size(function (d) { return +d[measures[2]] || 0; })
-              .useVoronoi(false)
+              .useVoronoi(true)
+              .showLegend(false)
               .showDistX(true)
               .showDistY(true)
 
@@ -601,7 +601,7 @@ function lineChartHelper(dimensions, measures, isArea) {
   var xScale = d3.scale.ordinal().domain(x_vals);
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 20;
+      height = nv.utils.windowSize().height - 30;
 
   var chart = nv.models.lineChart()
     .options({
@@ -615,6 +615,7 @@ function lineChartHelper(dimensions, measures, isArea) {
       showXAxis: true,
       showYAxis: true,
       useVoronoi: true,
+      showLegend: false,
       transitionDuration: 250
     });
 
@@ -683,6 +684,8 @@ function render() {
     var chart = fn(dimensions, measures);
     return chart;
   });
+
+  $('details').removeAttr('open');
 }
 
 function validParameters(vizType, dimensions, measures) {

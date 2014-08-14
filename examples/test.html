@@ -12,6 +12,11 @@ body,html {
   height: 100%;
 }
 
+details {
+  padding-left: 10px;
+}
+
+
 text {
   font: 12px sans-serif;
 }
@@ -28,13 +33,18 @@ text {
 
 </style>
 <body>
-  <input type="file" id="uploader">
-  <div>
-  Dimensions<div id="dimensionsSelect" class="select2-container select2-container-multi"><input type="hidden" id="dimensionsSelect_val"></input></div>
-  Measures<div id="measuresSelect" class="select2-container select2-container-multi"><input type="hidden" id="measuresSelect_val"></input></div>
-  Widget<select id="vizType"></select>
-  <input id="renderBtn" type="button" value="Render"></input>
-  </div>
+  <details open>
+  <summary>Settings</summary>
+  <p>
+    <input type="file" id="uploader">
+    <div>
+    Dimensions<div id="dimensionsSelect" class="select2-container select2-container-multi"><input type="hidden" id="dimensionsSelect_val"></input></div>
+    Measures<div id="measuresSelect" class="select2-container select2-container-multi"><input type="hidden" id="measuresSelect_val"></input></div>
+    Widget<select id="vizType"></select>
+    <input id="renderBtn" type="button" value="Render"></input>
+    </div>
+  </p>
+  </details>
   <div id="container" class='with-3d-shadow with-transitions'>
     <svg></svg>
   </div>
