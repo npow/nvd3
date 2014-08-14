@@ -19,10 +19,24 @@ types.forEach(function (key) {
   $('#vizType').append($('<option/>').val(key).text(key));
 });
 
+function filterVizTypes() {
+  var dimensions = $('#dimensionsSelect').select2('val');
+  var measures = $('#measuresSelect').select2('val');
+  for (var type in vizTypes) {
+    if (dimensions.length < vizTypes[type].ndimensions || measures.length < vizTypes[type].nmeasures) {
+      $('#vizType option[value="' + type + '"]').hide();
+    } else {
+      $('#vizType option[value="' + type + '"]').show();
+    }
+  }
+}
+
 function populateSelect2(id, vals) {
   $(id).select2({ tags: vals });
   $(id).on('change', function () {
     $(id + '_val').html($(id).val());
+    filterVizTypes();
+    $('#vizType').val('Select Widget Type');
   });
   $(id).select2('container').find('ul.select2-choices').sortable({
     containment: 'parent',
@@ -48,6 +62,8 @@ function processData(csv) {
 
   $('#dimensionsSelect').select2('val', []);
   $('#measuresSelect').select2('val', []);
+
+  filterVizTypes();
 }
 
 d3.csv('OlympicAthletes_small.csv', function (csv) {
@@ -184,6 +200,7 @@ function pieChart(dimensions, measures) {
 }
 
 function barChart(dimensions, measures) {
+  dimensions = dimensions.slice(0, 1);
   var measure = measures[0];
   var data = transformData(csv, dimensions, csvMeasures);
 
@@ -208,6 +225,7 @@ function barChart(dimensions, measures) {
 }
 
 function barChartHorizontal(dimensions, measures) {
+  dimensions = dimensions.slice(0, 1);
   var measure = measures[0];
   var data = transformData(csv, dimensions, csvMeasures);
 
@@ -691,7 +709,7 @@ function render() {
 function validParameters(vizType, dimensions, measures) {
   var settings = vizTypes[vizType];
   if (!settings) {
-    alert('Unknown type: ' + vizType);
+    alert('No widget selected');
     return false;
   } else if (dimensions.length < settings.ndimensions || measures.length < settings.nmeasures) {
     alert(vizType + ' needs >= ' + settings.ndimensions + ' dimension(s), >= ' + settings.nmeasures + ' measure(s)');
