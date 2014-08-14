@@ -1,3 +1,5 @@
+var g_filters = {};
+
 var vizTypes = {
   multiBarChart: { ndimensions: 2, nmeasures: 1 },
   radarChart: { ndimensions: 2, nmeasures: 1 },
@@ -29,6 +31,54 @@ function filterVizTypes() {
       $('#vizType option[value="' + type + '"]').show();
     }
   }
+}
+
+var arrayUnique = function(a) {
+    return a.reduce(function(p, c) {
+        if (p.indexOf(c) < 0) p.push(c);
+        return p;
+    }, []);
+};
+
+function getColumn(key) {
+  var vals = [];
+  csv.forEach(function (d, i) {
+    if (d[key]) vals.push(d[key]);
+  });
+  return arrayUnique(vals).sort();
+}
+
+function populateMultiselect(id, vals) {
+  vals.forEach(function (val) {
+    $(id).append($('<option selected/>').val(val).text(val));
+  });
+}
+
+function createFilters(dimensions, measures) {
+  $('#filterContainer').empty();
+  g_filters = {};
+  dimensions.forEach(function (dimension) {
+    var id = dimension + '_select';
+    var vals = getColumn(dimension);
+    $('#filterContainer').append(dimension + '<select id="' + id + '" class="multiselect" multiple="multiple"></div>');
+    populateMultiselect('#' + id, vals);
+    $('#' + id).multiselect({
+      includeSelectAllOption: true,
+      enableFiltering: true,
+      enableCaseInsensitiveFiltering: true,
+      maxHeight: 400,
+      onChange: function (option, checked) {
+        var selectedVals = [].map.call($('#' + id + ' option:selected'), function (x) { return $(x).val(); })
+        g_filters[dimension] = function (d) {
+          return selectedVals.indexOf(d[dimension]) > -1;
+        }
+        render(false);
+      }
+    });
+  });
+  measures.forEach(function (measure) {
+
+  });
 }
 
 function populateSelect2(id, vals) {
@@ -181,13 +231,13 @@ function transformData(csv, dimensions, measures) {
   return data;
 }
 
-function pieChart(dimensions, measures) {
+function pieChart(csv, dimensions, measures) {
   dimensions = dimensions.slice(0, 1);
   var measure = measures[0];
   var data = transformData(csv, dimensions, csvMeasures);
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 20;
+      height = nv.utils.windowSize().height - 50;
 
   var chart = nv.models.pieChart()
       .width(width)
@@ -205,13 +255,13 @@ function pieChart(dimensions, measures) {
   return chart;
 }
 
-function barChart(dimensions, measures) {
+function barChart(csv, dimensions, measures) {
   dimensions = dimensions.slice(0, 1);
   var measure = measures[0];
   var data = transformData(csv, dimensions, csvMeasures);
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 20;
+      height = nv.utils.windowSize().height - 50;
 
   var chart = nv.models.discreteBarChart()
       .width(width)
@@ -230,13 +280,13 @@ function barChart(dimensions, measures) {
   return chart;
 }
 
-function barChartHorizontal(dimensions, measures) {
+function barChartHorizontal(csv, dimensions, measures) {
   dimensions = dimensions.slice(0, 1);
   var measure = measures[0];
   var data = transformData(csv, dimensions, csvMeasures);
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 20;
+      height = nv.utils.windowSize().height - 50;
 
   var chart = nv.models.multiBarHorizontalChart()
       .width(width)
@@ -258,13 +308,13 @@ function barChartHorizontal(dimensions, measures) {
   return chart;
 }
 
-function multiBarChart(dimensions, measures) {
+function multiBarChart(csv, dimensions, measures) {
   dimensions = dimensions.slice(0, 2);
   var measure = measures[0];
   var data = transformData(csv, dimensions, csvMeasures);
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 20;
+      height = nv.utils.windowSize().height - 50;
 
   var chart = nv.models.multiBarChart()
       .width(width)
@@ -288,13 +338,13 @@ function multiBarChart(dimensions, measures) {
   return chart;
 }
 
-function multiBarChartHorizontal(dimensions, measures) {
+function multiBarChartHorizontal(csv, dimensions, measures) {
   dimensions = dimensions.slice(0, 2);
   var measure = measures[0];
   var data = transformData(csv, dimensions, csvMeasures);
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 20;
+      height = nv.utils.windowSize().height - 50;
 
   var chart = nv.models.multiBarHorizontalChart()
       .x(function(d) { return d.key })
@@ -316,7 +366,7 @@ function multiBarChartHorizontal(dimensions, measures) {
   return chart;
 }
 
-function stackedArea(dimensions, measures) {
+function stackedArea(csv, dimensions, measures) {
   dimensions = dimensions.slice(0, 2);
   var measure = measures[0];
   var data = transformData(csv, dimensions, csvMeasures);
@@ -327,7 +377,7 @@ function stackedArea(dimensions, measures) {
   });
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 30;
+      height = nv.utils.windowSize().height - 50;
 
   var chart = nv.models.stackedAreaChart()
               .width(width)
@@ -384,7 +434,7 @@ function findLineByLeastSquares(values_x, values_y) {
   return { m: m, b: b };
 }
 
-function parallelCoordinates(dimensions, measures) {
+function parallelCoordinates(csv, dimensions, measures) {
   dimensions = dimensions && measures ? dimensions.concat(measures) : csvDimensions.concat(csvMeasures);
   $('#container').addClass('parcoords');
 
@@ -408,13 +458,13 @@ function parallelCoordinates(dimensions, measures) {
     .brushable();
 }
 
-function scatterChart(dimensions, measures) {
+function scatterChart(csv, dimensions, measures) {
   dimensions = dimensions.slice(0, 1);
   measures = measures.slice(0, 3);
   var data = transformData(csv, dimensions, csvMeasures);
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 20;
+      height = nv.utils.windowSize().height - 50;
 
 //  var chart = nv.models.scatterPlusLineChart()
   var chart = nv.models.scatterChart()
@@ -486,7 +536,7 @@ function parallelSets(dimensions, _) {
   vis.datum(data).call(chart);
 }
 
-function bubbleChart(dimensions, measures) {
+function bubbleChart(csv, dimensions, measures) {
   dimensions = dimensions.slice(0, 2);
   var measure = measures[0];
   var x_key = dimensions[1];
@@ -601,15 +651,15 @@ function bubbleChart(dimensions, measures) {
 	}
 }
 
-function areaChart(dimensions, measures) {
-  return lineChartHelper(dimensions, measures, true);
+function areaChart(csv, dimensions, measures) {
+  return lineChartHelper(csv, dimensions, measures, true);
 }
 
-function lineChart(dimensions, measures) {
-  return lineChartHelper(dimensions, measures, false);
+function lineChart(csv, dimensions, measures) {
+  return lineChartHelper(csv, dimensions, measures, false);
 }
 
-function lineChartHelper(dimensions, measures, isArea) {
+function lineChartHelper(csv, dimensions, measures, isArea) {
   dimensions = dimensions.slice(0, 2);
   var data = transformData(csv, dimensions, csvMeasures);
   var measure = measures[0];
@@ -625,7 +675,7 @@ function lineChartHelper(dimensions, measures, isArea) {
   var xScale = d3.scale.ordinal().domain(x_vals);
 
   var width = nv.utils.windowSize().width - 100,
-      height = nv.utils.windowSize().height - 30;
+      height = nv.utils.windowSize().height - 50;
 
   var chart = nv.models.lineChart()
     .options({
@@ -664,7 +714,7 @@ function lineChartHelper(dimensions, measures, isArea) {
   return chart;
 }
 
-function radarChart(dimensions, measures) {
+function radarChart(csv, dimensions, measures) {
   var measure = measures[0];
   var data = transformData(csv, dimensions, csvMeasures);
 
@@ -689,7 +739,7 @@ function radarChart(dimensions, measures) {
   svg.append('g').classed('focus', 1).datum(data).call(chart);
 }
 
-function render() {
+function render(shouldCreateFilters) {
   var dimensions = $('#dimensionsSelect').select2('val');
   var measures = $('#measuresSelect').select2('val');
   var vizType = $('#vizType').val();
@@ -705,11 +755,16 @@ function render() {
   nv.addGraph(function() {
     $('#container').removeClass('parcoords');
     var fn = eval(vizType);
-    var chart = fn(dimensions, measures);
+    var filteredCsv = csv;
+    for (var key in g_filters) {
+      filteredCsv = filteredCsv.filter(g_filters[key]);
+    }
+    var chart = fn(filteredCsv, dimensions, measures);
     return chart;
   });
 
   $('details').removeAttr('open');
+  if (shouldCreateFilters) createFilters(dimensions, measures);
 }
 
 function validParameters(vizType, dimensions, measures) {
@@ -726,7 +781,7 @@ function validParameters(vizType, dimensions, measures) {
 
 $(document).ready(function () {
   $('#renderBtn').click(function () {
-    render();
+    render(true);
   });
 
   // CSV Uploader

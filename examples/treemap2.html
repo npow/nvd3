@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link href="../src/nv.d3.css" rel="stylesheet" type="text/css">
+<style>
+
+body {
+  overflow-y:scroll;
+  background: #fcfcfa;
+  color: #333;
+}
+
+#test1 {
+  background: #ddd;
+}
+
+.node {
+  border: solid 1px white;
+  font: 10px sans-serif;
+  line-height: 12px;
+  overflow: hidden;
+  position: absolute;
+  text-indent: 2px;
+}
+
+</style>
+<body>
+
+<svg id="test1"></svg>
+
+<script src="../lib/d3.v3.js"></script>
+<script src="../nv.d3.js"></script>
+<script src="../src/utils.js"></script>
+<script src="../src/models/treemap.js"></script>
+<script>
+var margin = {top: 20, right: 0, bottom: 0, left: 0},
+    label = function (d) { return d.key; },
+    value = function (d) { return +d['MetroSubprimeScore']; },
+    children = function (d) { return d.values; },
+    title = function (d) {
+      if (d._children) return d.key;
+      return d['MetroSubprimeScore'];
+    };
+
+function convertToTree(keys, rows) {
+  var data = d3.nest();
+  keys.forEach(function (key) {
+    data = data.key(function (d) { return d[key]; });
+  });
+  /*
+  data = data.rollup(function (d) {
+    return d3.mean(d, function (g) { return g['MetroSubprimeScore']; });
+  });
+  */
+  data = data.entries(rows);
+
+  return data;
+}
+
+d3.csv('IntraMetro_RiskScores_September_2013_modified2.csv', function (rows) {
+    var keys = ['State', 'ZIPCountyName'];
+    var root = { key: 'root', values: convertToTree(keys, rows) };
+    var domain = d3.extent(rows, function (d) { return +d['MetroSubprimeScore']; });
+    var domain2 = [domain[0], (domain[0]+domain[1])/2, domain[1]];
+    var mapper = d3.scale.linear().range(["red", "white", "green"]).domain(domain2);
+    var color = function (d) {
+      if (d._children) return mapper(d.value/d._children.length);
+      return mapper(+d['MetroSubprimeScore']);
+    };
+    nv.addGraph({
+        generate: function() {
+            var width = nv.utils.windowSize().width - 40,
+                height = nv.utils.windowSize().height - 40;
+
+            var chart = nv.models.treemap()
+                .width(width)
+                .height(height)
+                .margin(margin)
+                .title(title)
+                .label(label)
+                .value(value)
+                .color(color)
+                .domain(domain)
+                .children(children);
+
+            d3.select("#test1")
+                .datum(root)
+                .transition().duration(1200)
+                .call(chart);
+
+            return chart;
+        },
+        callback: function(graph) {
+            window.onresize = function() {
+                var width = nv.utils.windowSize().width - 40,
+                height = nv.utils.windowSize().height - 40;
+
+                if (width < margin.left + margin.right + 20)
+                width = margin.left + margin.right + 20;
+
+                if (height < margin.top + margin.bottom + 20)
+                height = margin.top + margin.bottom + 20;
+
+                graph
+                .width(width)
+                .height(height);
+
+                d3.select('#test1')
+                .call(graph);
+            };
+        }
+    });
+});
+</script>

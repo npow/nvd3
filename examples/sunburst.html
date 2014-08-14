@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link href="../src/nv.d3.css" rel="stylesheet" type="text/css">
+<style>
+  @import url(http://bl.ocks.org/style.css?20120730);
+
+body {
+  overflow-y:scroll;
+  background: #fcfcfa;
+  color: #333;
+}
+
+#test1 {
+  background: #ddd;
+}
+
+</style>
+<body>
+
+<svg id="test1"></svg>
+
+<script src="../lib/d3.v3.js"></script>
+<script src="../nv.d3.js"></script>
+<script src="../src/utils.js"></script>
+<script src="../src/models/sunburst.js"></script>
+<script>
+var label = function (d) { return d.myname; },
+    value = function (d) { return d.mysize; },
+    children = function (d) { return d.mychildren; };
+
+d3.json('orig_flare.json', function (root) {
+    nv.addGraph({
+        generate: function() {
+            var width = nv.utils.windowSize().width - 40,
+                height = nv.utils.windowSize().height - 40;
+
+            var chart = nv.models.sunburst()
+                .width(width)
+                .height(height);
+                /*
+                .label(label)
+                .value(value)
+                .children(children);
+                */
+
+            d3.select("#test1")
+                .datum(root)
+                .transition().duration(1200)
+                .call(chart);
+
+            return chart;
+        },
+        callback: function(graph) {
+            window.onresize = function() {
+                var width = nv.utils.windowSize().width - 40,
+                height = nv.utils.windowSize().height - 40;
+
+                graph
+                .width(width)
+                .height(height);
+
+                d3.select('#test1')
+                .call(graph);
+            };
+        }
+    });
+});
+</script>
