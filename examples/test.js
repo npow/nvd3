@@ -58,7 +58,11 @@ function processData(csv) {
     });
   });
   populateSelect2('#dimensionsSelect', csvDimensions);
-  populateSelect2('#measuresSelect', csvMeasures.concat(csvMeasures.map(function (x) { return 'Sum ' + x; }).concat(csvMeasures.map(function (x) { return 'Mean ' + x; }))));
+  populateSelect2('#measuresSelect',
+      csvMeasures.map(function (x) { return 'Sum ' + x; })
+        .concat(csvMeasures.map(function (x) { return 'Mean ' + x; }))
+//        .concat(csvMeasures.map(function (x) { return 'Count ' + x; }))
+        .concat(csvMeasures));
 
   $('#dimensionsSelect').select2('val', []);
   $('#measuresSelect').select2('val', []);
@@ -125,12 +129,14 @@ function transformData(csv, dimensions, measures) {
   measures.forEach(function (measure) {
     empty['Sum ' + measure] = 0;
     empty['Mean ' + measure] = 0;
+    empty['Count ' + measure] = 0;
   });
   var rollup = function (d) {
     var o = {};
     measures.forEach(function (measure) {
       o['Sum ' + measure] = d3.sum(d, function (g) { return +g[measure]; });
       o['Mean ' + measure] = d3.mean(d, function (g) { return +g[measure]; });
+      o['Count ' + measure] = d.length;
     });
     return [o];
   };
