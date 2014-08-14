@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="../css/jquery-ui.min.css">
+<style>
+body,html {
+  width: 100%;
+  height: 100%;
+}
+
+.resizable {
+  width: 1000px;
+  float: left;
+  cursor: hand;
+}
+
+.myframe {
+    width: 1000px;
+    height: 500px;
+    display: inline-block;
+}
+
+#addButton {
+  width: 150px;
+  padding: 5px;
+  display: block;
+}
+
+</style>
+<script src="../lib/jquery.min.js"></script>
+<script src="../lib/jquery-ui.min.js"></script>
+<body>
+  <input id="addButton" type="submit" value="Add Widget (+)"></input>
+</body>
+
+<script>
+$(function() {
+  $('.resizable').on('dragstart', drag_start);
+  $('body').on('dragover', drag_over);
+  $('body').on('drop', drop);
+  $('#addButton').click(function () {
+    $('body').append('<div class="resizable"><iframe class="myframe" src="test.html"></iframe></div>');
+    $('.resizable').resizable({
+      start: function(event, ui) {
+        ui.element.append($("<div/>", {
+          id: "iframe-barrier",
+          css: {
+            position: "absolute",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            "z-index": 10
+        }
+        }));
+      },
+      stop: function(event, ui) {
+        $("#iframe-barrier", ui.element).remove();
+      },
+      resize: function(event, ui) {
+        $("iframe", ui.element).width(ui.size.width).height(ui.size.height);
+      }
+    });
+  });
+});
+
+function drag_start(event) {
+    var style = window.getComputedStyle(event.target, null);
+    event.dataTransfer.setData("text/plain",
+    (parseInt(style.getPropertyValue("left"),10) - event.clientX) + ',' + (parseInt(style.getPropertyValue("top"),10) - event.clientY));
+} 
+function drag_over(event) { 
+    event.preventDefault(); 
+    return false; 
+} 
+function drop(event) { 
+    var offset = event.dataTransfer.getData("text/plain").split(',');
+    var dm = document.getElementById('dragme');
+    dm.style.left = (event.clientX + parseInt(offset[0],10)) + 'px';
+    dm.style.top = (event.clientY + parseInt(offset[1],10)) + 'px';
+    event.preventDefault();
+    return false;
+}
+</script>
